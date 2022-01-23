@@ -42,8 +42,8 @@ def process_a_post(df: pd.DataFrame) -> pd.DataFrame:
     df['data_date'] = pd.to_datetime(df['data_date'], yearfirst=False)
     df['file_processed_date'] = pd.to_datetime(df['file_processed_date'], yearfirst=True)
 
-    df['active pop %'] = (df['active'] / df['population'] * 100).round(1)
-    df['approximate infected pop %'] = (df['cases'] / df['population'] * 100).round(1)
+    df['active pop %'] = (df['active'] / df['population'] * 100).round(2)
+    df['approximate infected pop %'] = (df['cases'] / df['population'] * 100).round(2)
 
     return df
 

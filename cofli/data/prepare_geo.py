@@ -1,6 +1,9 @@
 import pandas as pd
 import geopandas as gpd
+from datetime import date
 folder = "gs://covid-analytics-data/data/vic/gov"
+today = str(date.today())
+
 
 def prepare_vic_post(df: pd.DataFrame):
     # Load Geo data for postcode from source1
