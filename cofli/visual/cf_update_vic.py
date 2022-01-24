@@ -17,6 +17,8 @@ def save_fig(fig, opath):
 
 def update_fig(filename='post'):
     df = pd.read_parquet(f"{folder}/result/cases_{filename}.parquet")
+
+    ### Update geo fig
     df_today = df.query(f"file_processed_date == '{today}'").set_index('postcode')
 
     gdf = gpd.read_file(f"{folder}/data/geo/vic/postcode.shp").set_index('postcode')
@@ -36,5 +38,8 @@ def update_fig(filename='post'):
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 
     save_fig(fig, f"{folder}/result/vic_post_active_map.pickle")
+
+    ### Update VIC timeseries
+    
 
     return
