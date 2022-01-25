@@ -3,9 +3,7 @@ import gcsfs
 import pandas as pd
 import geopandas as gpd
 import plotly.express as px
-from datetime import date
-folder = "gs://covid-analytics-data/data/vic/gov"
-today = str(date.today())
+from cofli.settings import folder, today
 
 
 def save_fig(fig, opath):
@@ -15,7 +13,7 @@ def save_fig(fig, opath):
     return
 
 
-def update_fig(filename='post'):
+def update_figs(filename='post'):
     df = pd.read_parquet(f"{folder}/result/cases_{filename}.parquet")
 
     ### Update geo fig

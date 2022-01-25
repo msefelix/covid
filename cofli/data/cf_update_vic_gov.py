@@ -1,9 +1,7 @@
 import requests
 import gcsfs
 import pandas as pd
-from datetime import date
-folder = "gs://covid-analytics-data/data/vic/gov"
-today = str(date.today())
+from cofli.settings import folder, today
 
 
 def fetch_url_to_gcs(fs, url: str, opath: str):
@@ -54,13 +52,6 @@ def add_a_csv(filename='post'):
 
     df_old = pd.read_parquet(f"{folder}/data/vic/cases_{filename}.parquet")
 
-    df = pd.concat([df_old, df_new], axis=0, ignore_index=True)
+    df = pd.concat([df_old, df_new], axis=0, ignore_index=True).drop_duplicates()
     df.to_parquet(f"{folder}/data/vic/cases_{filename}.parquet")
-    return
-
-
-def main(event, context):
-    vic_by_location()
-    add_a_csv()
-
     return
