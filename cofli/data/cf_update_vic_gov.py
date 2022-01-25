@@ -1,8 +1,8 @@
 import requests
 import gcsfs
 import pandas as pd
-from cofli.settings import folder, today
-
+from cofli.settings import bucket, today
+folder = f"{bucket}/data/vic/gov"
 
 def fetch_url_to_gcs(fs, url: str, opath: str):
     """Download a file from the URL and save it at opath on GCS.

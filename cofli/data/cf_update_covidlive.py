@@ -1,10 +1,11 @@
 import pandas as pd
+from cofli.settings import bucket
 
 
 def update_ts_by_state(state:str) -> pd.DataFrame:
     ### Download data
     live_ts = {}
-    for ts_type in ['active-cases', 'tests', 'hospitalised']:
+    for ts_type in ['cases', 'active-cases', 'tests', 'hospitalised']:
         df_temp = pd.read_html(f"https://covidlive.com.au/report/daily-{ts_type}/{state}")[1]
         live_ts[ts_type] = df_temp
         
@@ -21,6 +22,6 @@ def update_ts_by_state(state:str) -> pd.DataFrame:
     res['active (k)'] = (res['active'] / 1000)
     res['tests (k)'] = (res['tests'] / 1000)
 
-    res = res.drop(['active', 'tests'], axis=1).fillna(0).astype(int).reset_index()
+    res = res.drop(['cases', 'active', 'tests'], axis=1).fillna(0).astype(int).reset_index()
         
     return res

@@ -1,16 +1,9 @@
-import pickle
-import gcsfs
 import pandas as pd
 import geopandas as gpd
 import plotly.express as px
-from cofli.settings import folder, today
-
-
-def save_fig(fig, opath):
-    fs = gcsfs.GCSFileSystem()
-    with fs.open(opath, "wb") as f:
-        pickle.dump(fig, f)
-    return
+from cofli.settings import bucket, today
+from cofli.visual.utils import save_fig
+folder = f"{bucket}/data/vic/gov"
 
 
 def update_figs(filename='post'):
