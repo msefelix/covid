@@ -55,7 +55,7 @@ def update_ts(opath):
 
         # Get 7 day moving average
         ts7 = ts_df.rolling('7D').mean().fillna(0).astype(int)
-        ts7.columns = [f"{x}_7D" for x in ts7.columns]
+        ts7.columns = [f"7D AVG - {x}" for x in ts7.columns]
         ts_df = ts_df.join(ts7)
 
         ts_df.to_parquet(f"{opath}/{location}.parquet")
