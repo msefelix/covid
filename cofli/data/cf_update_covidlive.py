@@ -8,8 +8,11 @@ def download_ts_by_location(location:str) -> Dict[str, pd.DataFrame]:
     for ts_type, cols in {'cases':['NEW'],
                         'active-cases':['ACTIVE'],
                         'tests':['NET'],
+                        'deaths':['NET'],
                         'hospitalised':['HOSP', 'ICU', 'VENT']}.items():
         df_temp = pd.read_html(f"https://covidlive.com.au/report/daily-{ts_type}/{location}")[1][['DATE'] + cols]
+        if ts_type == 'deaths':
+            df_temp = df_temp.rename(columns={'net':'deaths'})
         live_ts[ts_type] = df_temp
     
     return live_ts
@@ -32,7 +35,7 @@ def consolidate_ts(live_ts: Dict[str, pd.DataFrame]) -> pd.DataFrame:
     
     res = pd.concat(res, axis=1, ignore_index=False).dropna(how='all').rename(columns={'net':'tests'})
     
-    for col in ['new', 'tests', 'active']:
+    for col in ['new', 'tests', 'active', 'deaths']:
         if res[col].dtype == 'O':
             res[col] = res[col].replace(to_replace={'-':0})
         res[col] = res[col].fillna(0).astype(int)
