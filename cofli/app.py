@@ -1,6 +1,7 @@
 import dash
 from dash import html
 from dash import dcc
+from dash.dependencies import Input, Output
 from cofli.visual.utils import load_fig
 from cofli.settings import locations
 from cofli.visual.cf_update_covidlive import fig_types
@@ -18,28 +19,47 @@ app.renderer = 'var renderer = new DashRenderer();'
 def _build_ts_graph(id, figures, cname):
     return dcc.Graph(id=id, figure=figures[id], className=cname)
 
-def build_ts_by_location(covidlive_ts_figs, location):
+
+# @app.callback(
+#     Output(component_id='covidlive-ts-plots', component_property='children'),
+#     Input(component_id='location-dropdown', component_property='value')
+# )
+def build_ts_by_location(location):
     figures = covidlive_ts_figs[location]
     return html.Div([html.Div([
                                 _build_ts_graph('active (k)', figures, 'six columns'),
                                 _build_ts_graph('hosp', figures, 'six columns')
                             ],
-                            className='three rows'),
+                            className='two rows'),
                     html.Div([
                                 _build_ts_graph('new', figures, 'six columns'),
                                 _build_ts_graph('deaths', figures, 'six columns'),
                             ],
-                            className='three rows'),
+                            className='two rows'),
                     html.Div([
                                 _build_ts_graph('icu', figures, 'six columns'),
                                 _build_ts_graph('vent', figures, 'six columns'),
                             ],
-                            className='three rows')
+                            className='two rows')
                     ],
-                    className='nine rows')
+                    className='six rows',
+                    id='covidlive-ts-plots')
 
 
-app.layout = html.Div([build_ts_by_location(covidlive_ts_figs, 'vic')])
+def build_location_dropdown():
+    return dcc.Dropdown(
+        id='location-dropdown',
+        options=[
+            {'label': 'Australia', 'value': 'aus'},
+            {'label': 'Victoria', 'value': 'vic'},
+            {'label': 'New South Wales', 'value': 'nsw'}
+        ],
+        value='aus', className='twelve rows'
+    )
+
+
+app.layout = html.Div([build_location_dropdown(),
+                      build_ts_by_location('vic')])
 
 
 if __name__ == '__main__':
