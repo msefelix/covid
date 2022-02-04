@@ -57,7 +57,7 @@ def update_ts(opath):
         ts_df = consolidate_ts(live_ts)
 
         # Get 7 day moving average
-        ts7 = ts_df.rolling('-7D').mean().fillna(0).astype(int)
+        ts7 = ts_df.rolling('7D').mean().fillna(0).astype(int)
         ts7.columns = [f"7D AVG - {x}" for x in ts7.columns]
         ts_df = ts_df.join(ts7)
 
