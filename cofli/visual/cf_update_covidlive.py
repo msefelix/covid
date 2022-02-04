@@ -16,18 +16,18 @@ def make_a_ts_fig(df: pd.DataFrame, y:str, title:str):
     df_temp = df[[y, f"7D AVG - {y}"]]
     df_temp.columns = cols
     fig = px.line(df_temp, x=df_temp.index, y=cols, 
-                  title=title, labels={'y':'', 'x':'DATE'})
+                  title=title, labels={'y':''})
     fig.update_layout(title={'y':0.9, 'x':0.5, 'xanchor': 'center', 'yanchor': 'top'},
-                    yaxis={'title':''})
+                    yaxis={'title':''}, xaxis={'title':'DATE'})
     return fig
 
 
-def make_ts_figs(folder: str):
-    all_ts = {location : pd.read_parquet(f"{folder}/data/covidlive/{location}.parquet") for location in locations}
+def make_ts_figs(rf: str):
+    all_ts = {location : pd.read_parquet(f"{rf}/data/covidlive/{location}.parquet") for location in locations}
 
     for location in locations:
         for data_type, data_name in fig_types.items():
             fig = make_a_ts_fig(all_ts[location], data_type, data_name)
-            save_fig(fig, f"{folder}/data/covidlive/ts_figs/{location}_{data_type}.pickle")
+            save_fig(fig, f"{rf}/data/covidlive/ts_figs/{location}_{data_type}.pickle")
 
     return
