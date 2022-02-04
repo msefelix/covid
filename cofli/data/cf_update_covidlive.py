@@ -12,7 +12,7 @@ def download_ts_by_location(location:str) -> Dict[str, pd.DataFrame]:
                         'hospitalised':['HOSP', 'ICU', 'VENT']}.items():
         df_temp = pd.read_html(f"https://covidlive.com.au/report/daily-{ts_type}/{location}")[1][['DATE'] + cols]
         if ts_type == 'deaths':
-            df_temp = df_temp.rename(columns={'net':'deaths'})
+            df_temp = df_temp.rename(columns={'NET':'DEATHS'})
         live_ts[ts_type] = df_temp
     
     return live_ts
