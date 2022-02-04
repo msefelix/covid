@@ -18,11 +18,11 @@ def make_a_ts_fig(df: pd.DataFrame, y:str, title:str):
     df_temp.columns = cols
     fig = px.line(df_temp, x=df_temp.index, y=cols, 
                   title=title, labels={'y':''})
-    fig.update_layout(title={'y':0.92, 'x':0.5, 'xanchor': 'center', 'yanchor': 'top'},
+    fig.update_layout(title={'y':0.99, 'x':0.5, 'xanchor': 'center', 'yanchor': 'top'},
                     yaxis={'title':''}, 
                     xaxis={'title':''},
-                    margin=go.layout.Margin(l=0, r=0, b=0, t=80),
-                    legend=dict(yanchor='top', y=0.95, xanchor='left', x=0.05)
+                    margin=go.layout.Margin(l=0, r=10, b=0, t=25),
+                    legend=dict(yanchor='top', y=0.95, xanchor='left', x=0.05, title='')
                     )
     return fig
 
