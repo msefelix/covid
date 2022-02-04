@@ -16,6 +16,14 @@ def download_ts_by_location(location:str) -> Dict[str, pd.DataFrame]:
 
 
 def consolidate_ts(live_ts: Dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """[summary]
+
+    Args:
+        live_ts (Dict[str, pd.DataFrame]): [description]
+
+    Returns:
+        pd.DataFrame: A table indexed by DatetimeIndex
+    """    
     res = []
     for df_temp in live_ts.values():
         df_temp.columns = [x.lower() for x in df_temp.columns]
@@ -32,7 +40,7 @@ def consolidate_ts(live_ts: Dict[str, pd.DataFrame]) -> pd.DataFrame:
     res['active (k)'] = (res['active'] / 1000)
     res['tests (k)'] = (res['tests'] / 1000)
 
-    res = res.drop(['active', 'tests'], axis=1).fillna(0).astype(int).reset_index()
+    res = res.drop(['active', 'tests'], axis=1).fillna(0).astype(int)
         
     return res
 
@@ -40,7 +48,16 @@ def consolidate_ts(live_ts: Dict[str, pd.DataFrame]) -> pd.DataFrame:
 def update_ts(opath):
     for location in locations:
         print(location)
+
         live_ts = download_ts_by_location(location)
+
         ts_df = consolidate_ts(live_ts)
+
+        # Get 7 day moving average
+        ts7 = ts_df.rolling('7D').mean().fillna(0).astype(int)
+        ts7.columns = [f"{x}_7D" for x in ts7.columns]
+        ts_df = ts_df.join(ts7)
+
         ts_df.to_parquet(f"{opath}/{location}.parquet")
+
     return
