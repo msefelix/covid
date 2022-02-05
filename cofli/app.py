@@ -7,7 +7,15 @@ from cofli.visual.utils import load_fig
 from cofli.settings import locations
 from cofli.visual.cf_update_covidlive import fig_types
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = [
+    'https://codepen.io/chriddyp/pen/bWLwgP.css',
+    {
+        'href': 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css',
+        'rel': 'stylesheet',
+        'integrity': 'sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO',
+        'crossorigin': 'anonymous'
+    }
+]
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.renderer = 'var renderer = new DashRenderer();'
 
@@ -89,16 +97,16 @@ def build_ts_by_location(location, start_date, end_date):
 
 
 app.layout = html.Div([
-                        html.Div([
-                                    html.H6("Select an area", className='thre columns', style={'textAlign': 'center'}),
+                        html.Div([html.Div([
+                                    html.H6("Select an area", className='four columns', style={'textAlign': 'center'}),
                                     build_location_dropdown()
                                     ], 
                                 className='six columns'),
                         html.Div([
-                                    html.H6("Select date range", className='thre columns', style={'textAlign': 'center'}),
+                                    html.H6("Select date range", className='four columns', style={'textAlign': 'center'}),
                                     build_date_range()
                                     ], 
-                                className='six columns'),
+                                className='six columns')]),
                         html.Div(id='covidlive-ts-plots')])
 
 
