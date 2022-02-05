@@ -38,12 +38,8 @@ def consolidate_ts(live_ts: Dict[str, pd.DataFrame]) -> pd.DataFrame:
     for col in ['new', 'tests', 'active', 'deaths']:
         if res[col].dtype == 'O':
             res[col] = res[col].replace(to_replace={'-':0})
-        res[col] = res[col].fillna(0).astype(int)
 
-    res['active (k)'] = (res['active'] / 1000)
-    res['tests (k)'] = (res['tests'] / 1000)
-
-    res = res.drop(['active', 'tests'], axis=1).fillna(0).astype(int)
+    res = res.fillna(0).astype(int)
         
     return res
 

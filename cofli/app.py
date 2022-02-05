@@ -27,7 +27,7 @@ def _build_ts_graph(id, figures, cname):
 def build_ts_by_location(location):
     figures = covidlive_ts_figs[location]
     return html.Div([html.Div([
-                                _build_ts_graph('active (k)', figures, 'six columns'),
+                                _build_ts_graph('active', figures, 'six columns'),
                                 _build_ts_graph('hosp', figures, 'six columns')
                             ],
                             className='two rows'),
@@ -51,8 +51,14 @@ def build_location_dropdown():
         id='location-dropdown',
         options=[
             {'label': 'Australia', 'value': 'aus'},
+            {'label': 'ACT', 'value': 'act'},
+            {'label': 'New South Wales', 'value': 'nsw'},
+            {'label': 'North Territory', 'value': 'nt'},
+            {'label': 'Queensland', 'value': 'qld'},
+            {'label': 'South Australia', 'value': 'sa'},
+            {'label': 'Tasmania', 'value': 'tas'},
             {'label': 'Victoria', 'value': 'vic'},
-            {'label': 'New South Wales', 'value': 'nsw'}
+            {'label': 'West Australia', 'value': 'wa'}
         ],
         value='aus', className='twelve rows'
     )

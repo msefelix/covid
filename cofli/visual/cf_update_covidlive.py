@@ -8,8 +8,8 @@ fig_types = {'new':'Daily New Cases (PCR + RAT)',
                                     'hosp':'Hospitalised', 
                                     'icu':'In ICU', 
                                     'vent':'On Ventilator', 
-                                    'active (k)':'Active Cases in Thousands', 
-                                    'tests (k)':'PCR Test in Thousands'}
+                                    'active':'Active Cases', 
+                                    'tests':'PCR Test'}
 
 
 def make_a_ts_fig(df: pd.DataFrame, y:str, title:str):
@@ -21,7 +21,7 @@ def make_a_ts_fig(df: pd.DataFrame, y:str, title:str):
     fig.update_layout(title={'y':0.99, 'x':0.5, 'xanchor': 'center', 'yanchor': 'top'},
                     yaxis={'title':''}, 
                     xaxis={'title':''},
-                    margin=go.layout.Margin(l=0, r=10, b=0, t=25),
+                    margin=go.layout.Margin(l=0, r=10, b=20, t=25),
                     showlegend=False
                     # legend=dict(yanchor='top', y=0.95, xanchor='left', x=0.05, title='')
                     )
