@@ -1,4 +1,5 @@
 import dash
+import dash_bootstrap_components as dbc
 from dash import html
 from dash import dcc
 from dash.dependencies import Input, Output
@@ -7,25 +8,43 @@ from cofli.visual.utils import load_fig
 from cofli.settings import locations
 from cofli.visual.cf_update_covidlive import fig_types
 
+################## Data loading
+folder = "/home/felix/learning/covid_aus"
+today = str(date.today())
+year, month, day = map(int, today.split('-'))
 
-import dash_bootstrap_components as dbc
-# https://www.bootstrapcdn.com/bootswatch/
+# FIXME: date range callback not aligned with fig reset axis
+covidlive_ts_figs = {location : {f"ts-figure-{fig_type}" : load_fig(f"{folder}/data/covidlive/ts_figs/{location}_{fig_type}.pickle")
+                                for fig_type in fig_types.keys()} 
+                    for location in locations}
+vic_postcode_fig = load_fig(f"{folder}/result/vic_post_active_map.pickle")
+
+################## App settings
+tabs_styles = {
+    'height': '44px'
+}
+tab_style = {
+    'borderBottom': '1px solid #d6d6d6',
+    'padding': '6px',
+    'fontWeight': 'bold'
+}
+
+tab_selected_style = {
+    'borderTop': '1px solid #d6d6d6',
+    'borderBottom': '1px solid #d6d6d6',
+    'backgroundColor': '#119DFF',
+    'color': 'white',
+    'padding': '6px'
+}
+
+
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP],
                 meta_tags=[{'name': 'viewport',
                             'content': 'width=device-width, initial-scale=1.0'}]
                 )
 
 
-folder = "/home/felix/learning/covid_aus"
-today = str(date.today())
-year, month, day = map(int, today.split('-'))
-
-
-covidlive_ts_figs = {location : {f"ts-figure-{fig_type}" : load_fig(f"{folder}/data/covidlive/ts_figs/{location}_{fig_type}.pickle")
-                                for fig_type in fig_types.keys()} 
-                    for location in locations}
-
-
+################## App content building
 def build_location_dropdown():
     return dcc.Dropdown(
         id='location-dropdown',
@@ -89,11 +108,13 @@ def build_ts_by_location(location, start_date, end_date):
                     )
 
 
-app.layout = dbc.Container([
+def build_ts_tab():
+    return  [
+            html.Br(),
             dbc.Row(
                 [
-                dbc.Col(html.H3("Select location", className='text-center text-primary mb-4'), width=3),
-                dbc.Col(html.H3("Select date range", className='text-center text-primary mb-4'), width=3)
+                dbc.Col(html.H5("Select location", className='text-center text-primary mb-4'), width=3),
+                dbc.Col(html.H5("Select date range", className='text-center text-primary mb-4'), width=3)
                 ],
                 justify="evenly",
             ),
@@ -105,7 +126,25 @@ app.layout = dbc.Container([
                 justify="evenly",
             ),
             html.Br(),
-            html.Div(id='covidlive-ts-plots')              
+            html.Div(id='covidlive-ts-plots')           
+            ]
+
+
+################## App layout
+app.layout = dbc.Container([
+                            html.H1("COVID-19 Trend in Australia", className='text-center text-primary mb-4'),
+                            dcc.Tabs(id="top-tabs", value='timeseries', 
+                                    children=[
+                                            dcc.Tab(label='Evolution by state',
+                                                    value='timeseries', 
+                                                    children=build_ts_tab(),
+                                                    style=tab_style, selected_style=tab_selected_style),
+                                            dcc.Tab(label='Victoria by postcode',
+                                                    value='vic-postcode',
+                                                    children=[html.H1("VIC distribution by postcode to be added"),
+                                                            dcc.Graph(id='vic-postcode', figure=vic_postcode_fig)],
+                                                    style=tab_style, selected_style=tab_selected_style)
+                                    ], style=tabs_styles)
                             ])
 
 
