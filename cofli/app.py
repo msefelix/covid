@@ -20,10 +20,10 @@ def _build_ts_graph(id, figures, cname):
     return dcc.Graph(id=id, figure=figures[id], className=cname)
 
 
-# @app.callback(
-#     Output(component_id='covidlive-ts-plots', component_property='children'),
-#     Input(component_id='location-dropdown', component_property='value')
-# )
+@app.callback(
+    Output(component_id='covidlive-ts-plots', component_property='children'),
+    Input(component_id='location-dropdown', component_property='value')
+)
 def build_ts_by_location(location):
     figures = covidlive_ts_figs[location]
     return html.Div([html.Div([
@@ -42,8 +42,8 @@ def build_ts_by_location(location):
                             ],
                             className='two rows')
                     ],
-                    className='six rows',
-                    id='covidlive-ts-plots')
+                    className='six rows'
+                    )
 
 
 def build_location_dropdown():
@@ -59,7 +59,7 @@ def build_location_dropdown():
 
 
 app.layout = html.Div([build_location_dropdown(),
-                      build_ts_by_location('vic')])
+                      html.Div(id='covidlive-ts-plots')])
 
 
 if __name__ == '__main__':
