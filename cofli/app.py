@@ -7,17 +7,13 @@ from cofli.visual.utils import load_fig
 from cofli.settings import locations
 from cofli.visual.cf_update_covidlive import fig_types
 
-external_stylesheets = [
-    'https://codepen.io/chriddyp/pen/bWLwgP.css',
-    {
-        'href': 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css',
-        'rel': 'stylesheet',
-        'integrity': 'sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO',
-        'crossorigin': 'anonymous'
-    }
-]
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-app.renderer = 'var renderer = new DashRenderer();'
+
+import dash_bootstrap_components as dbc
+# https://www.bootstrapcdn.com/bootswatch/
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP],
+                meta_tags=[{'name': 'viewport',
+                            'content': 'width=device-width, initial-scale=1.0'}]
+                )
 
 
 folder = "/home/felix/learning/covid_aus"
@@ -45,7 +41,6 @@ def build_location_dropdown():
             {'label': 'West Australia', 'value': 'wa'}
         ],
         value='aus',
-        className='four columns',
         style={'align-items': 'center', 'justify-content': 'center'}
     )
 
@@ -60,10 +55,11 @@ def build_date_range():
         style={'align-items': 'center', 'justify-content': 'center'})
 
 
-def _build_ts_graph(id, figures, cname, date_ranges):
+def _build_ts_graph(id, figures, date_ranges):
     fig = figures[id]
     fig = fig.update_xaxes(range=date_ranges)
-    return dcc.Graph(id=id, figure=fig, className=cname)
+    fig.layout.template = 'plotly_white'
+    return dcc.Graph(id=id, figure=fig)
 
 
 @app.callback(
@@ -76,39 +72,154 @@ def build_ts_by_location(location, start_date, end_date):
 # FIXME Decouple figure update induced by date from location induced update
     figures = covidlive_ts_figs[location]
     date_ranges = (str(start_date), str(end_date))
-    return html.Div([html.Div([
-                                _build_ts_graph('ts-figure-active', figures, 'six columns', date_ranges),
-                                _build_ts_graph('ts-figure-hosp', figures, 'six columns', date_ranges)
-                            ],
-                            className='two rows'),
-                    html.Div([
-                                _build_ts_graph('ts-figure-new', figures, 'six columns', date_ranges),
-                                _build_ts_graph('ts-figure-deaths', figures, 'six columns', date_ranges),
-                            ],
-                            className='two rows'),
-                    html.Div([
-                                _build_ts_graph('ts-figure-icu', figures, 'six columns', date_ranges),
-                                _build_ts_graph('ts-figure-vent', figures, 'six columns', date_ranges),
-                            ],
-                            className='two rows')
-                    ],
-                    className='six rows'
+    return html.Div([
+                    dbc.Row([
+                                dbc.Col(_build_ts_graph('ts-figure-active', figures, date_ranges), width=6),
+                                dbc.Col(_build_ts_graph('ts-figure-hosp', figures, date_ranges), width=6)
+                            ]),
+                    dbc.Row([
+                                dbc.Col(_build_ts_graph('ts-figure-new', figures, date_ranges), width=6),
+                                dbc.Col(_build_ts_graph('ts-figure-deaths', figures, date_ranges), width=6)
+                            ]),
+                    dbc.Row([
+                                dbc.Col(_build_ts_graph('ts-figure-icu', figures, date_ranges), width=6),
+                                dbc.Col(_build_ts_graph('ts-figure-vent', figures, date_ranges), width=6)
+                            ]),
+                    ]
                     )
 
 
-app.layout = html.Div([
-                        html.Div([html.Div([
-                                    html.H6("Select an area", className='four columns', style={'textAlign': 'center'}),
-                                    build_location_dropdown()
-                                    ], 
-                                className='six columns'),
-                        html.Div([
-                                    html.H6("Select date range", className='four columns', style={'textAlign': 'center'}),
-                                    build_date_range()
-                                    ], 
-                                className='six columns')]),
-                        html.Div(id='covidlive-ts-plots')])
+app.layout = dbc.Container([
+            dbc.Row(
+                [
+                dbc.Col(html.H3("Select location", className='text-center text-primary mb-4'), width=3),
+                dbc.Col(html.H3("Select date range", className='text-center text-primary mb-4'), width=3)
+                ],
+                justify="evenly",
+            ),
+            dbc.Row(
+                [
+                dbc.Col(build_location_dropdown(), width=3), 
+                dbc.Col(build_date_range(), width=3)
+                ],
+                justify="evenly",
+            ),
+            html.Br(),
+            html.Div(id='covidlive-ts-plots')              
+                            ])
 
 
 if __name__ == '__main__':
     app.run_server(debug=True)
+
+
+# # # Layout section: Bootstrap (https://hackerthemes.com/bootstrap-cheatsheet/)
+# # # ************************************************************************
+# app.layout = dbc.Container([
+
+#     dbc.Row(
+#         dbc.Col(html.H1("Stock Market Dashboard",
+#                         className='text-center text-primary mb-4'),
+#                 width=12)
+#     ),
+
+#     dbc.Row([
+
+#         dbc.Col([
+#             dcc.Dropdown(id='my-dpdn', multi=False, value='AMZN',
+#                          options=[{'label':x, 'value':x}
+#                                   for x in sorted(df['Symbols'].unique())],
+#                          ),
+#             dcc.Graph(id='line-fig', figure={})
+#         ],# width={'size':5, 'offset':1, 'order':1},
+#            xs=12, sm=12, md=12, lg=5, xl=5
+#         ),
+
+#         dbc.Col([
+#             dcc.Dropdown(id='my-dpdn2', multi=True, value=['PFE','BNTX'],
+#                          options=[{'label':x, 'value':x}
+#                                   for x in sorted(df['Symbols'].unique())],
+#                          ),
+#             dcc.Graph(id='line-fig2', figure={})
+#         ], #width={'size':5, 'offset':0, 'order':2},
+#            xs=12, sm=12, md=12, lg=5, xl=5
+#         ),
+
+#     ], no_gutters=True, justify='start'),  # Horizontal:start,center,end,between,around
+
+#     dbc.Row([
+#         dbc.Col([
+#             html.P("Select Company Stock:",
+#                    style={"textDecoration": "underline"}),
+#             dcc.Checklist(id='my-checklist', value=['FB', 'GOOGL', 'AMZN'],
+#                           options=[{'label':x, 'value':x}
+#                                    for x in sorted(df['Symbols'].unique())],
+#                           labelClassName="mr-3"),
+#             dcc.Graph(id='my-hist', figure={}),
+#         ], #width={'size':5, 'offset':1},
+#            xs=12, sm=12, md=12, lg=5, xl=5
+#         ),
+
+#         dbc.Col([
+#             dbc.Card(
+#                 [
+#                     dbc.CardBody(
+#                         html.P(
+#                             "We're better together. Help each other out!",
+#                             className="card-text")
+#                     ),
+#                     dbc.CardImg(
+#                         src="https://media.giphy.com/media/Ll0jnPa6IS8eI/giphy.gif",
+#                         bottom=True),
+#                 ],
+#                 style={"width": "24rem"},
+#             )
+#         ], #width={'size':5, 'offset':1},
+#            xs=12, sm=12, md=12, lg=5, xl=5
+#         )
+#     ], align="center")  # Vertical: start, center, end
+
+# ], fluid=True)
+
+
+# # Callback section: connecting the components
+# # ************************************************************************
+# # Line chart - Single
+# @app.callback(
+#     Output('line-fig', 'figure'),
+#     Input('my-dpdn', 'value')
+# )
+# def update_graph(stock_slctd):
+#     dff = df[df['Symbols']==stock_slctd]
+#     figln = px.line(dff, x='Date', y='High')
+#     return figln
+
+
+# # Line chart - multiple
+# @app.callback(
+#     Output('line-fig2', 'figure'),
+#     Input('my-dpdn2', 'value')
+# )
+# def update_graph(stock_slctd):
+#     dff = df[df['Symbols'].isin(stock_slctd)]
+#     figln2 = px.line(dff, x='Date', y='Open', color='Symbols')
+#     return figln2
+
+
+# # Histogram
+# @app.callback(
+#     Output('my-hist', 'figure'),
+#     Input('my-checklist', 'value')
+# )
+# def update_graph(stock_slctd):
+#     dff = df[df['Symbols'].isin(stock_slctd)]
+#     dff = dff[dff['Date']=='2020-12-03']
+#     fighist = px.histogram(dff, x='Symbols', y='Close')
+#     return fighist
+
+
+# if __name__=='__main__':
+#     app.run_server(debug=True, port=8000)
+
+    
+# # https://youtu.be/0mfIK8zxUds
