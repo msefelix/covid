@@ -56,7 +56,7 @@ def create_ts_figs(vic_gov_ts, postcode:int):
             {
             # 'active': '# of Active Cases', 
             # 'cases': '# of Total Cases',
-            'new': '# of new Cases',
-            'active pop %': '% of Active Cases out of population',
-            'approximate infected pop %': '% of Total Cases out of population'
+            'new': '# of New Cases (PCR)',
+            'active pop %': '% of Active Cases out of Population',
+            'approximate infected pop %': '% of Total Cases out of Population'
             }.items()}

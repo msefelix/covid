@@ -1,5 +1,6 @@
 import pandas as pd
 import dash
+import json
 import dash_bootstrap_components as dbc
 from dash import html
 from dash import dcc
@@ -10,12 +11,17 @@ from cofli.settings import locations
 from cofli.visual.cf_update_covidlive import fig_types
 from cofli.visual.cf_update_vic import create_ts_figs
 
+################## Todo
+# Make high level trend figures shorter
+# Add high level data preparation to cloud func
+# Update vic postcode data
+
+
 ################## Data loading
 folder = "/home/felix/learning/covid_aus"
 today = str(date.today())
 year, month, day = map(int, today.split('-'))
 
-# FIXME: date range callback not aligned with fig reset axis
 covidlive_ts_figs = {location : {f"ts-figure-{fig_type}" : load_fig(f"{folder}/data/covidlive/ts_figs/{location}_{fig_type}.pickle")
                                 for fig_type in fig_types.keys()} 
                     for location in locations}
@@ -134,12 +140,19 @@ def build_ts_tab():
             ]
 
 
-
-def build_vic_postcode_ts(postcode=3000):
+@app.callback(
+    Output('vic-postcode-clicked', 'children'),
+    Output('vic-postcode-ts', 'children'),
+    Input('vic-postcode', 'clickData'))
+def build_vic_postcode_ts(input_data):
+    try:
+        postcode = int(input_data['points'][0]['location'])
+    except:
+        postcode = 3000
+    
     figs = create_ts_figs(vic_gov_ts, postcode)
-    return [dbc.Col(dcc.Graph(id=f'vic-postcode-ts-{x}', figure=figs[x]), width=4) 
+    return f"Trend of Postcode {postcode}", [dbc.Col(dcc.Graph(id=f'vic-postcode-ts-{x}', figure=figs[x]), width=4) 
             for x in ['new', 'active pop %', 'approximate infected pop %']]
-
 
 ################## App layout
 app.layout = dbc.Container([
@@ -153,10 +166,12 @@ app.layout = dbc.Container([
                                             dcc.Tab(label='Victoria by postcode',
                                                     value='vic-postcode',
                                                     children=[
-                                                            html.H4("Caveat: Population data is not up-to-date and it will be updated with census 2021 data once available"),
+                                                            html.H4("Caveat: Population data is not up-to-date and it will be updated with census 2021 data once available",
+                                                                    className='text-center text-primary mb-4'),
                                                             dbc.Row(dcc.Graph(id='vic-postcode', figure=vic_postcode_fig)),
                                                             html.Br(),
-                                                            dbc.Row(build_vic_postcode_ts())
+                                                            html.H4(id='vic-postcode-clicked', className='text-center text-primary mb-4'),
+                                                            dbc.Row(id='vic-postcode-ts')
                                                             ],
                                                     style=tab_style, selected_style=tab_selected_style)
                                     ], style=tabs_styles)
