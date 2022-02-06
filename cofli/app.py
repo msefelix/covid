@@ -1,3 +1,4 @@
+import pandas as pd
 import dash
 import dash_bootstrap_components as dbc
 from dash import html
@@ -7,6 +8,7 @@ from datetime import date
 from cofli.visual.utils import load_fig
 from cofli.settings import locations
 from cofli.visual.cf_update_covidlive import fig_types
+from cofli.visual.cf_update_vic import create_ts_figs
 
 ################## Data loading
 folder = "/home/felix/learning/covid_aus"
@@ -17,7 +19,9 @@ year, month, day = map(int, today.split('-'))
 covidlive_ts_figs = {location : {f"ts-figure-{fig_type}" : load_fig(f"{folder}/data/covidlive/ts_figs/{location}_{fig_type}.pickle")
                                 for fig_type in fig_types.keys()} 
                     for location in locations}
-vic_postcode_fig = load_fig(f"{folder}/result/vic_post_active_map.pickle")
+
+vic_gov_ts = pd.read_parquet(f"{folder}/data/vic/cases_post.parquet")
+vic_postcode_fig = load_fig(f"{folder}/data/vic/vic_post_active_map.pickle")
 
 ################## App settings
 tabs_styles = {
@@ -130,6 +134,13 @@ def build_ts_tab():
             ]
 
 
+
+def build_vic_post(postcode=3000):
+    figs = create_ts_figs(vic_gov_ts, postcode)
+    return [dbc.Row(dcc.Graph(id=f'vic-postcode-ts-{x}', figure=figs[x])) 
+            for x in ['active', 'cases', 'new', 'active pop %', 'approximate infected pop %']]
+
+
 ################## App layout
 app.layout = dbc.Container([
                             html.H1("COVID-19 Trend in Australia", className='text-center text-primary mb-4'),
@@ -141,8 +152,10 @@ app.layout = dbc.Container([
                                                     style=tab_style, selected_style=tab_selected_style),
                                             dcc.Tab(label='Victoria by postcode',
                                                     value='vic-postcode',
-                                                    children=[html.H1("VIC distribution by postcode to be added"),
-                                                            dcc.Graph(id='vic-postcode', figure=vic_postcode_fig)],
+                                                    children=[
+                                                            dbc.Col(dcc.Graph(id='vic-postcode', figure=vic_postcode_fig), width=6),
+                                                            dbc.Col(build_vic_post(), width=6)
+                                                            ],
                                                     style=tab_style, selected_style=tab_selected_style)
                                     ], style=tabs_styles)
                             ])

@@ -1,13 +1,14 @@
 import pandas as pd
 import geopandas as gpd
+import plotly.graph_objs as go
 import plotly.express as px
 from cofli.settings import bucket, today
 from cofli.visual.utils import save_fig
 folder = f"{bucket}/data/vic/gov"
 
 
-def update_figs(filename='post'):
-    df = pd.read_parquet(f"{folder}/result/cases_{filename}.parquet")
+def update_geo_fig(filename='post'):
+    df = pd.read_parquet(f"{folder}/data/vic/cases_{filename}.parquet")
 
     ### Update geo fig
     df_today = df.query(f"file_processed_date == '{today}'").set_index('postcode')
@@ -28,9 +29,27 @@ def update_figs(filename='post'):
     fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 
-    save_fig(fig, f"{folder}/result/vic_post_active_map.pickle")
-
-    ### Update VIC timeseries
-    
+    save_fig(fig, f"{folder}/data/vic/vic_post_active_map.pickle")
 
     return
+
+
+def make_a_ts_fig(df: pd.DataFrame, y:str, title: str=''):
+    if title == '':
+        title = y
+
+    fig = px.line(df, x='date', y=y, 
+                  title=title, labels={'y':''},
+                  height=300)
+    fig.update_layout(title={'y':0.99, 'x':0.5, 'xanchor': 'center', 'yanchor': 'top'},
+                    yaxis={'title':''}, 
+                    xaxis={'title':''},
+                    margin=go.layout.Margin(l=0, r=10, b=20, t=25),
+                    showlegend=False)
+    fig.update_traces(mode='lines+markers')
+    return fig
+
+
+def create_ts_figs(vic_gov_ts, postcode:int):
+    df = vic_gov_ts.query(f"postcode == {postcode}").rename(columns={'data_date':'date'}).sort_values('date')
+    return {col : make_a_ts_fig(df, col) for col in ['active', 'cases', 'new', 'active pop %', 'approximate infected pop %']}
