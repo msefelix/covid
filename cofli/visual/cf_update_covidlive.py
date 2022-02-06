@@ -4,7 +4,7 @@ import pandas as pd
 from cofli.settings import locations
 from cofli.visual.utils import save_fig
 fig_types = {'new':'Daily New Cases (PCR + RAT)',
-                                    'deaths':'Lives Lost',
+                                    'deaths':'Daily Lives Lost',
                                     'hosp':'Hospitalised', 
                                     'icu':'In ICU', 
                                     'vent':'On Ventilator', 
@@ -17,7 +17,7 @@ def make_a_ts_fig(df: pd.DataFrame, y:str, title:str):
     df_temp = df[[y, f"7D AVG - {y}"]]
     df_temp.columns = cols
     fig = px.line(df_temp, x=df_temp.index, y=cols, 
-                  title=title, labels={'y':''}, height=300)
+                  title=title, labels={'y':''}, height=350)
     fig.update_layout(title={'y':0.99, 'x':0.5, 'xanchor': 'center', 'yanchor': 'top'},
                     yaxis={'title':''}, 
                     xaxis={'title':''},

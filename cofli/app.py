@@ -49,7 +49,7 @@ tab_selected_style = {
 }
 
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP],
+app = dash.Dash(__name__, external_stylesheets=["https://cdn.jsdelivr.net/npm/bootswatch@5.1.3/dist/minty/bootstrap.min.css"],
                 meta_tags=[{'name': 'viewport',
                             'content': 'width=device-width, initial-scale=1.0'}]
                 )
@@ -167,7 +167,7 @@ app.layout = dbc.Container([
                                             dcc.Tab(label='Victoria by postcode',
                                                     value='vic-postcode',
                                                     children=[
-                                                            html.H4("Caveat: Population data is not up-to-date and it will be updated with census 2021 data once available",
+                                                            html.H5("""Click an area on map to view details.\nCaveat: Population data is not up-to-date and it will be updated with census 2021 data once available""",
                                                                     className='text-center text-primary mb-4'),
                                                             dbc.Row(dcc.Graph(id='vic-postcode', figure=vic_postcode_fig)),
                                                             html.Br(),

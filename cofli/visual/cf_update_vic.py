@@ -46,6 +46,7 @@ def make_a_ts_fig(df: pd.DataFrame, y:str, title: str=''):
                     xaxis={'title':''},
                     margin=go.layout.Margin(l=0, r=10, b=20, t=25),
                     showlegend=False)
+    fig.layout.template = 'plotly_white'
     fig.update_traces(mode='lines+markers')
     return fig
 
