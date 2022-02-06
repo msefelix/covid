@@ -52,4 +52,9 @@ def make_a_ts_fig(df: pd.DataFrame, y:str, title: str=''):
 
 def create_ts_figs(vic_gov_ts, postcode:int):
     df = vic_gov_ts.query(f"postcode == {postcode}").rename(columns={'data_date':'date'}).sort_values('date')
-    return {col : make_a_ts_fig(df, col) for col in ['active', 'cases', 'new', 'active pop %', 'approximate infected pop %']}
+    return {col : make_a_ts_fig(df, col, title) for col, title in 
+            {'active': '# of Active Cases', 
+            'cases': '# of Total Cases',
+            'new': '# of new Cases',
+            'active pop %': '% of Active Cases out of population',
+            'approximate infected pop %': '% of Total Cases out of population'}.items()}
