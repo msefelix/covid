@@ -138,7 +138,7 @@ def build_ts_tab():
 def build_vic_postcode_ts(postcode=3000):
     figs = create_ts_figs(vic_gov_ts, postcode)
     return [dbc.Col(dcc.Graph(id=f'vic-postcode-ts-{x}', figure=figs[x]), width=4) 
-            for x in ['active', 'new',  'cases', 'active pop %', 'approximate infected pop %']]
+            for x in ['new', 'active pop %', 'approximate infected pop %']]
 
 
 ################## App layout
@@ -153,8 +153,9 @@ app.layout = dbc.Container([
                                             dcc.Tab(label='Victoria by postcode',
                                                     value='vic-postcode',
                                                     children=[
-                                                            html.H3("Caveat: Population data is not up-to-date and it will be updated with census 2021 data once available"),
+                                                            html.H4("Caveat: Population data is not up-to-date and it will be updated with census 2021 data once available"),
                                                             dbc.Row(dcc.Graph(id='vic-postcode', figure=vic_postcode_fig)),
+                                                            html.Br(),
                                                             dbc.Row(build_vic_postcode_ts())
                                                             ],
                                                     style=tab_style, selected_style=tab_selected_style)
