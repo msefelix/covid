@@ -46,6 +46,18 @@ def process_a_post(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def combine_csvs_once(filename='post'):
+    fs = gcsfs.GCSFileSystem()
+    files = [x for x in fs.ls(f"{bucket}/data/vic/gov") if f'vic_active_by_{filename}' in x]
+    dfs = map(lambda x:pd.read_csv(f"gs://{x}"), files)
+    dfs = pd.concat(dfs, axis=0, ignore_index=True)
+
+    dfs = process_a_post(dfs)
+
+    dfs.to_parquet(f"{bucket}/data/vic/cases_{filename}.parquet")
+
+    return dfs
+
 def add_a_csv(filename='post'):
     df_new = pd.read_csv(f"{bucket}/data/vic/gov/vic_active_by_{filename}_{today}.csv")
     df_new = process_a_post(df_new)
