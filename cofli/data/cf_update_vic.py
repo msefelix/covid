@@ -58,6 +58,7 @@ def combine_csvs_once(filename='post'):
 
     return dfs
 
+
 def add_a_csv(filename='post'):
     df_new = pd.read_csv(f"{bucket}/data/vic/gov/vic_active_by_{filename}_{today}.csv")
     df_new = process_a_post(df_new)

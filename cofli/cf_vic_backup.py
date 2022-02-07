@@ -1,7 +1,5 @@
 import requests
 import gcsfs
-import pandas as pd
-from typing import Dict
 from datetime import date
 bucket = "gs://covid-analytics-data"
 today = str(date.today())
@@ -32,7 +30,5 @@ def vic_by_location():
     return
 
 ### Main
-
 def main(event, context):
     vic_by_location()
-    update_ts(f"{bucket}/data/covidlive")
