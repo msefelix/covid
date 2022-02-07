@@ -25,7 +25,7 @@ def update_geo_fig(filename='post'):
                    hover_data=['population', 'active', 'cases', 'new', 'active pop %', 'approximate infected pop %'],
                    mapbox_style="carto-positron",
                    center = {"lat": -37.8136, "lon": 144.9631}, # this is melbourne's lat long
-                   opacity=0.5)
+                   opacity=0.5, height=600)
     fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 

@@ -30,6 +30,7 @@ covidlive_ts_figs = {location : {f"ts-figure-{fig_type}" : load_fig(f"{folder}/d
 vic_gov_ts = pd.read_parquet(f"{folder}/data/vic/cases_post.parquet")
 vic_postcode_fig = load_fig(f"{folder}/data/vic/vic_post_active_map.pickle")
 
+
 ################## App settings
 tabs_styles = {
     'height': '44px'
@@ -167,7 +168,8 @@ app.layout = dbc.Container([
                                             dcc.Tab(label='Victoria by postcode',
                                                     value='vic-postcode',
                                                     children=[
-                                                            html.H5("""Click an area on map to view details.\nCaveat: Population data is not up-to-date and it will be updated with census 2021 data once available""",
+                                                            html.H5("""Click an area on map to view details. Color reflects the percentage of active cases out of the population.
+                                                                       *Caveat*: Population data is not up-to-date and it will be updated with census 2021 data once available""",
                                                                     className='text-center text-primary mb-4'),
                                                             dbc.Row(dcc.Graph(id='vic-postcode', figure=vic_postcode_fig)),
                                                             html.Br(),
