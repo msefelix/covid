@@ -2,7 +2,7 @@ import requests
 import gcsfs
 import pandas as pd
 from cofli.settings import bucket, today
-folder = f"{bucket}/data/vic/gov"
+
 
 def fetch_url_to_gcs(fs, url: str, opath: str):
     """Download a file from the URL and save it at opath on GCS.
@@ -21,10 +21,10 @@ def vic_by_location():
     fs = gcsfs.GCSFileSystem()
     
     vic_active_by_gov = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9oKYNQhJ6v85dQ9qsybfMfc-eaJ9oKVDZKx-VGUr6szNoTbvsLTzpEaJ3oW_LZTklZbz70hDBUt-d/pub?gid=0&single=true&output=csv"
-    fetch_url_to_gcs(fs, vic_active_by_gov, f"{folder}/vic_active_by_gov_{today}.csv")
+    fetch_url_to_gcs(fs, vic_active_by_gov, f"{bucket}/data/vic/gov/vic_active_by_gov_{today}.csv")
 
     vic_active_by_post = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTwXSqlP56q78lZKxc092o6UuIyi7VqOIQj6RM4QmlVPgtJZfbgzv0a3X7wQQkhNu8MFolhVwMy4VnF/pub?gid=0&single=true&output=csv"
-    fetch_url_to_gcs(fs, vic_active_by_post, f"{folder}/vic_active_by_post_{today}.csv")
+    fetch_url_to_gcs(fs, vic_active_by_post, f"{bucket}/data/vic/gov/vic_active_by_post_{today}.csv")
 
     return
 
@@ -47,11 +47,12 @@ def process_a_post(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_a_csv(filename='post'):
-    df_new = pd.read_csv(f"{folder}/vic_active_by_{filename}_{today}.csv")
+    df_new = pd.read_csv(f"{bucket}/data/vic/gov/vic_active_by_{filename}_{today}.csv")
     df_new = process_a_post(df_new)
 
-    df_old = pd.read_parquet(f"{folder}/data/vic/cases_{filename}.parquet")
+    df_old = pd.read_parquet(f"{bucket}/data/vic/cases_{filename}.parquet")
 
     df = pd.concat([df_old, df_new], axis=0, ignore_index=True).drop_duplicates()
-    df.to_parquet(f"{folder}/data/vic/cases_{filename}.parquet")
+    df.to_parquet(f"{bucket}/data/vic/cases_{filename}.parquet")
+    
     return
