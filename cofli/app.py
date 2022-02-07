@@ -12,11 +12,14 @@ from cofli.visual.cf_update_covidlive import fig_types
 from cofli.visual.cf_update_vic import create_ts_figs
 
 ################## Todo
-# use repo for cf
+# Adjust repo for gcp & cf: # Update vic postcode data
 # Add high level data preparation to cloud func
-# Update vic postcode data
+
 # Make app work on GCP
+
 # Dep on app engine
+
+# use bar chart & line chart combination for ts (not urgent)
 
 
 ################## Data loading
