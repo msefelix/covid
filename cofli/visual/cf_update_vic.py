@@ -22,10 +22,10 @@ def update_geo_fig(filename='post'):
                    mapbox_style="carto-positron",
                    center = {"lat": -37.8136, "lon": 144.9631}, # this is melbourne's lat long
                    opacity=0.5, height=600)
-    fig.update_geos(fitbounds="locations", visible=False, fs=gcsfs.GCSFileSystem()) # fs is instantiated here due to cloud function 'bug'
+    fig.update_geos(fitbounds="locations", visible=False) # fs is instantiated here due to cloud function 'bug'
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 
-    save_pyfile(fig, f"{bucket}/data/vic/vic_post_active_map.pickle")
+    save_pyfile(fig, f"{bucket}/data/vic/vic_post_active_map.pickle", fs=gcsfs.GCSFileSystem())
 
     return
 
