@@ -1,13 +1,13 @@
 import pandas as pd
+import gcsfs
 import dash
-import json
 import dash_bootstrap_components as dbc
 from dash import html
 from dash import dcc
 from dash.dependencies import Input, Output
 from datetime import date
-from cofli.visual.utils import load_fig
-from cofli.settings import locations
+from cofli.utils import load_pyfile
+from cofli.settings import locations, bucket
 from cofli.visual.cf_update_covidlive import fig_types
 from cofli.visual.cf_update_vic import create_ts_figs
 
@@ -23,16 +23,16 @@ from cofli.visual.cf_update_vic import create_ts_figs
 
 
 ################## Data loading
-folder = "/home/felix/learning/covid_aus"
+fs = gcsfs.GCSFileSystem()
 today = str(date.today())
 year, month, day = map(int, today.split('-'))
 
-covidlive_ts_figs = {location : {f"ts-figure-{fig_type}" : load_fig(f"{folder}/data/covidlive/ts_figs/{location}_{fig_type}.pickle")
+covidlive_ts_figs = {location : {f"ts-figure-{fig_type}" : load_pyfile(f"{bucket}/data/covidlive/ts_figs/{location}_{fig_type}.pickle", fs=fs)
                                 for fig_type in fig_types.keys()} 
                     for location in locations}
 
-vic_gov_ts = pd.read_parquet(f"{folder}/data/vic/cases_post.parquet")
-vic_postcode_fig = load_fig(f"{folder}/data/vic/vic_post_active_map.pickle")
+vic_gov_ts = pd.read_parquet(f"{bucket}/data/vic/cases_post.parquet")
+vic_postcode_fig = load_pyfile(f"{bucket}/data/vic/vic_post_active_map.pickle", fs=fs)
 
 
 ################## App settings
