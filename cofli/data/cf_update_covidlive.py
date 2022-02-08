@@ -1,6 +1,6 @@
 import pandas as pd
 from typing import Dict
-from cofli.settings import locations
+from cofli.settings import locations, bucket
 
 
 def download_ts_by_location(location:str) -> Dict[str, pd.DataFrame]:
@@ -44,7 +44,7 @@ def consolidate_ts(live_ts: Dict[str, pd.DataFrame]) -> pd.DataFrame:
     return res
 
 
-def update_ts(opath):
+def update_ts():
     for location in locations:
         print(location)
 
@@ -57,6 +57,6 @@ def update_ts(opath):
         ts7.columns = [f"7D AVG - {x}" for x in ts7.columns]
         ts_df = ts_df.join(ts7)
 
-        ts_df.to_parquet(f"{opath}/{location}.parquet")
+        ts_df.to_parquet(f"{bucket}/data/covidlive/{location}.parquet")
 
     return
