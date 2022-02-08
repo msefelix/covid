@@ -2,7 +2,7 @@ import gcsfs
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
-from cofli.settings import locations
+from cofli.settings import locations, bucket
 from cofli.utils import save_pyfile
 fig_types = {'new':'Daily New Cases (PCR + RAT)',
                                     'deaths':'Daily Lives Lost',
@@ -28,7 +28,7 @@ def make_a_ts_fig(df: pd.DataFrame, y:str, title:str):
     return fig
 
 
-def make_ts_figs(bucket: str):
+def make_ts_figs():
     all_ts = {location : pd.read_parquet(f"{bucket}/data/covidlive/{location}.parquet") for location in locations}
 
     for location in locations:
