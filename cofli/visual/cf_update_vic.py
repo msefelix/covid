@@ -1,6 +1,5 @@
 import gcsfs
 import pandas as pd
-import geopandas as gpd
 import plotly.graph_objs as go
 import plotly.express as px
 from cofli.settings import bucket, today
@@ -10,7 +9,7 @@ from cofli.utils import save_pyfile, read_gcs_zip
 def update_geo_fig(filename='post'):
     df = pd.read_parquet(f"{bucket}/data/vic/cases_{filename}.parquet")
     df_today = df.query(f"file_processed_date == '{today}'").set_index('postcode')
-    gdf = read_gcs_zip(f"{bucket}/data/geo/vic/postcode.shp").set_index('postcode')
+    gdf = read_gcs_zip(f"{bucket}/data/geo/vic/vic.zip").set_index('postcode')
     df_today = gdf.join(df_today, how='right')
 
     fig = px.choropleth_mapbox(df_today,
