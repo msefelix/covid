@@ -1,8 +1,9 @@
+import gcsfs
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 from cofli.settings import locations
-from cofli.visual.utils import save_fig
+from cofli.utils import save_pyfile
 fig_types = {'new':'Daily New Cases (PCR + RAT)',
                                     'deaths':'Daily Lives Lost',
                                     'hosp':'Hospitalised', 
@@ -22,18 +23,17 @@ def make_a_ts_fig(df: pd.DataFrame, y:str, title:str):
                     yaxis={'title':''}, 
                     xaxis={'title':''},
                     margin=go.layout.Margin(l=0, r=10, b=20, t=25),
-                    showlegend=False
-                    # legend=dict(yanchor='top', y=0.95, xanchor='left', x=0.05, title='')
+                    showlegend=False # legend=dict(yanchor='top', y=0.95, xanchor='left', x=0.05, title='')
                     )
     return fig
 
 
-def make_ts_figs(rf: str):
-    all_ts = {location : pd.read_parquet(f"{rf}/data/covidlive/{location}.parquet") for location in locations}
+def make_ts_figs(bucket: str):
+    all_ts = {location : pd.read_parquet(f"{bucket}/data/covidlive/{location}.parquet") for location in locations}
 
     for location in locations:
         for data_type, data_name in fig_types.items():
             fig = make_a_ts_fig(all_ts[location], data_type, data_name)
-            save_fig(fig, f"{rf}/data/covidlive/ts_figs/{location}_{data_type}.pickle")
+            save_pyfile(fig, f"{bucket}/data/covidlive/ts_figs/{location}_{data_type}.pickle", fs=gcsfs.GCSFileSystem())
 
     return

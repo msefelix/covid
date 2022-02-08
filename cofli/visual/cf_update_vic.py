@@ -1,19 +1,16 @@
+import gcsfs
 import pandas as pd
 import geopandas as gpd
 import plotly.graph_objs as go
 import plotly.express as px
 from cofli.settings import bucket, today
-from cofli.visual.utils import save_fig
-folder = f"{bucket}/data/vic/gov"
+from cofli.utils import save_pyfile
 
 
 def update_geo_fig(filename='post'):
-    df = pd.read_parquet(f"{folder}/data/vic/cases_{filename}.parquet")
-
-    ### Update geo fig
+    df = pd.read_parquet(f"{bucket}/data/vic/cases_{filename}.parquet")
     df_today = df.query(f"file_processed_date == '{today}'").set_index('postcode')
-
-    gdf = gpd.read_file(f"{folder}/data/geo/vic/postcode.shp").set_index('postcode')
+    gdf = gpd.read_file(f"{bucket}/data/geo/vic/postcode.shp").set_index('postcode')
     df_today = gdf.join(df_today, how='right')
 
     fig = px.choropleth_mapbox(df_today,
@@ -21,15 +18,15 @@ def update_geo_fig(filename='post'):
                    geojson=df_today.geometry,
                    color="active pop %",
                    color_continuous_scale="Viridis",
-                   range_color=(0, 4), #int(df['active pop %'].quantile(0.99)) + 1),
+                   range_color=(0, int(df['active pop %'].quantile(0.99)) + 1),
                    hover_data=['population', 'active', 'cases', 'new', 'active pop %', 'approximate infected pop %'],
                    mapbox_style="carto-positron",
                    center = {"lat": -37.8136, "lon": 144.9631}, # this is melbourne's lat long
                    opacity=0.5, height=600)
-    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_geos(fitbounds="locations", visible=False, fs=gcsfs.GCSFileSystem()) # fs is instantiated here due to cloud function 'bug'
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 
-    save_fig(fig, f"{folder}/data/vic/vic_post_active_map.pickle")
+    save_pyfile(fig, f"{bucket}/data/vic/vic_post_active_map.pickle")
 
     return
 
