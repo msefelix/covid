@@ -1,5 +1,4 @@
 import pandas as pd
-import gcsfs
 import dash
 import dash_bootstrap_components as dbc
 from dash import html
@@ -23,7 +22,13 @@ from cofli.visual.cf_update_vic import create_ts_figs
 
 
 ################## Data loading
+### Local mode
+# fs = ''
+# bucket = "/home/felix/learning/covid_aus"
+### GCP mode
+import gcsfs
 fs = gcsfs.GCSFileSystem()
+
 today = str(date.today())
 year, month, day = map(int, today.split('-'))
 
