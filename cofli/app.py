@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import dash
 import dash_bootstrap_components as dbc
@@ -191,7 +192,8 @@ app.layout = dbc.Container([
 
 
 if __name__ == '__main__':
-    app.run_server(port=8080, debug=True)
+    debug = False if os.environ["DASH_DEBUG_MODE"] == "False" else True
+    app.run_server(port=8080, debug=debug)
 
 
 # # # Layout section: Bootstrap (https://hackerthemes.com/bootstrap-cheatsheet/)
