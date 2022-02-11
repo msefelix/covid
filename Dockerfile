@@ -7,4 +7,4 @@ RUN set -ex && \
     python3 -m pip install --upgrade pip && \
     pip install -r requirements.txt
 EXPOSE 8080
-CMD ["python", "./app/app.py"]
+CMD ["python", "app.py"]
