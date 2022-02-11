@@ -64,4 +64,4 @@ urllib3==1.26.8
 Werkzeug==2.0.3
 yarl==1.7.2
 zipp==3.7.0
-cofli @ git+https://github.com/msefelix/covid.git@772a744ca3c4779cf539ee69d6550964a1171574
+cofli @ git+https://github.com/msefelix/covid.git
