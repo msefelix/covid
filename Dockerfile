@@ -7,7 +7,7 @@ WORKDIR /app
 
 RUN set -ex && \
     python3 -m pip install --upgrade pip && \
-    pip install -r requirements.txt &&\
+    pip install -r requirements.txt && \
     pip install Flask gunicorn
 
 CMD exec gunicorn --bind :$PORT main:app
