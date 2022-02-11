@@ -193,7 +193,7 @@ app.layout = dbc.Container([
 
 if __name__ == '__main__':
     debug = False if os.environ["DASH_DEBUG_MODE"] == "False" else True
-    app.run_server(port=8080, debug=debug)
+    app.run_server(port=8050, debug=debug)
 
 
 # # # Layout section: Bootstrap (https://hackerthemes.com/bootstrap-cheatsheet/)
