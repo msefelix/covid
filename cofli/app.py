@@ -24,11 +24,11 @@ from cofli.visual.cf_update_vic import create_ts_figs
 
 ################## Data loading
 ### Local mode
-fs = ''
+# fs = ''
 
 ### GCP mode
-# import gcsfs
-# fs = gcsfs.GCSFileSystem()
+import gcsfs
+fs = gcsfs.GCSFileSystem()
 
 today = str(date.today())
 year, month, day = map(int, today.split('-'))
