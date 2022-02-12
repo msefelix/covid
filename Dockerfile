@@ -1,7 +1,7 @@
 FROM python:3.7
 
 ENV FSTYPE "gcs"
-ENV BUCKET "./"
+ENV BUCKET "gcs://covid-analytics-data"
 COPY . /app
 WORKDIR /app
 RUN set -ex && \
