@@ -23,12 +23,12 @@ from cofli.visual.cf_update_vic import create_ts_figs
 
 
 ################## Data loading
-### Local mode
-# fs = ''
-
-### GCP mode
-import gcsfs
-fs = gcsfs.GCSFileSystem()
+fstype = os.getenv('FSTYPE')
+if fstype == 'local':
+    fs = ''
+else:
+    import gcsfs
+    fs = gcsfs.GCSFileSystem()
 
 today = str(date.today())
 year, month, day = map(int, today.split('-'))
@@ -64,7 +64,7 @@ app = dash.Dash(__name__, external_stylesheets=["https://cdn.jsdelivr.net/npm/bo
                 meta_tags=[{'name': 'viewport',
                             'content': 'width=device-width, initial-scale=1.0'}]
                 )
-
+server = app.server
 
 ################## App content building
 def build_location_dropdown():
@@ -191,10 +191,6 @@ app.layout = dbc.Container([
                             ])
 
 
-def main():
-    debug = False if os.environ["DASH_DEBUG_MODE"] == "False" else True
-    app.run_server(port=8050, debug=debug)
-
-
 if __name__ == '__main__':
-    main()
+    debug = False if os.environ["DASH_DEBUG_MODE"] == "False" else True
+    app.run_server(debug=True, host="0.0.0.0", port=8080, use_reloader=False)
