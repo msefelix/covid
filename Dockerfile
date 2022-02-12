@@ -8,4 +8,4 @@ RUN set -ex && \
     python3 -m pip install --upgrade pip && \
     pip install -r requirements.txt && \
     pip install Flask gunicorn
-CMD gunicorn -b 0.0.0.0:80 app:server
+CMD exec gunicorn --bind :$PORT main:app

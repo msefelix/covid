@@ -11,6 +11,10 @@ from cofli.settings import locations, bucket
 from cofli.visual.cf_update_covidlive import fig_types
 from cofli.visual.cf_update_vic import create_ts_figs
 
+################## Settings for main, app.yaml and Dockerfile
+# https://github.com/GoogleCloudPlatform/python-docs-samples/tree/main/appengine/flexible/tasks
+
+
 ################## Todo
 # Adjust repo for gcp & cf: # Update vic postcode data
 # Add high level data preparation to cloud func
@@ -64,7 +68,7 @@ app = dash.Dash(__name__, external_stylesheets=["https://cdn.jsdelivr.net/npm/bo
                 meta_tags=[{'name': 'viewport',
                             'content': 'width=device-width, initial-scale=1.0'}]
                 )
-server = app.server
+# server = app.server
 
 ################## App content building
 def build_location_dropdown():
@@ -192,5 +196,4 @@ app.layout = dbc.Container([
 
 
 if __name__ == '__main__':
-    debug = False if os.environ["DASH_DEBUG_MODE"] == "False" else True
-    app.run_server(debug=True, host="0.0.0.0", port=8080, use_reloader=False)
+    app.run(host='127.0.0.1', port=8080, debug=True)
