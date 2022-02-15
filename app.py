@@ -97,7 +97,7 @@ def build_date_range():
 
 
 def _build_ts_graph(id, figures, date_ranges):
-    fig = figures[id]
+    fig = figures[id.split("-")[-1]]
     fig = fig.update_xaxes(range=date_ranges)
     fig.layout.template = 'plotly_white'
     return dcc.Graph(id=id, figure=fig)
