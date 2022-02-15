@@ -6,9 +6,10 @@ COPY . /app
 WORKDIR /app
 
 RUN set -ex && \
-    chmod +x /start.sh && \
+    chmod +x ./start.sh && \
     python3 -m pip install --upgrade pip && \
+    pip install gsutil && \
     pip install -r requirements.txt && \
     pip install Flask gunicorn
 
-CMD ["/start.sh"]
+CMD ["./start.sh"]
