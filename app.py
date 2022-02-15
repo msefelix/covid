@@ -71,6 +71,13 @@ app = dash.Dash(__name__, external_stylesheets=["https://cdn.jsdelivr.net/npm/bo
 # Expose Flask instance
 server = app.server
 
+# # Trial with log
+# import logging
+# gunicorn_logger = logging.getLogger('gunicorn.error')
+# app.logger.handlers = gunicorn_logger.handlers
+# app.logger.setLevel(logging.DEBUG)
+
+
 ################## App content building
 def build_location_dropdown():
     return dcc.Dropdown(
@@ -197,4 +204,4 @@ app.layout = dbc.Container([
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True, host="0.0.0.0", port=80)
+    app.run_server(debug=True, host="0.0.0.0", port=8080)
