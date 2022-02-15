@@ -45,6 +45,7 @@ def consolidate_ts(live_ts: Dict[str, pd.DataFrame]) -> pd.DataFrame:
 
 
 def update_ts():
+    all_ts = []
     for location in locations:
         print(location)
 
@@ -58,5 +59,13 @@ def update_ts():
         ts_df = ts_df.join(ts7)
 
         ts_df.to_parquet(f"{bucket}/data/covidlive/{location}.parquet")
+
+        ts_df = pd.read_parquet(f"{bucket}/data/covidlive/{location}.parquet")
+
+        ts_df['location'] = location
+        all_ts.append(ts_df.reset_index())
+
+    all_ts = pd.concat(all_ts, axis=0, ignore_index=True).set_index('date')
+    all_ts.to_parquet(f"{bucket}/data/covidlive/all.parquet")
 
     return

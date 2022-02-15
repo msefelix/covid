@@ -8,7 +8,7 @@ from dash.dependencies import Input, Output
 from datetime import date
 from cofli.utils import load_pyfile
 from cofli.settings import locations, bucket
-from cofli.visual.cf_update_covidlive import fig_types
+from cofli.visual.cf_update_covidlive import fig_types, make_ts_figs
 from cofli.visual.cf_update_vic import create_ts_figs
 
 ################## Settings for main, app.yaml and Dockerfile
@@ -37,10 +37,7 @@ else:
 today = str(date.today())
 year, month, day = map(int, today.split('-'))
 
-covidlive_ts_figs = {location : {f"ts-figure-{fig_type}" : load_pyfile(f"{bucket}/data/covidlive/ts_figs/{location}_{fig_type}.pickle", fs=fs)
-                                for fig_type in fig_types.keys()} 
-                    for location in locations}
-
+covidlive_ts_figs = make_ts_figs(save_figs=False)
 vic_gov_ts = pd.read_parquet(f"{bucket}/data/vic/cases_post.parquet")
 vic_postcode_fig = load_pyfile(f"{bucket}/data/vic/vic_post_active_map.pickle", fs=fs)
 
