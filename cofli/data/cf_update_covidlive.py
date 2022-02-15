@@ -60,8 +60,6 @@ def update_ts():
 
         ts_df.to_parquet(f"{bucket}/data/covidlive/{location}.parquet")
 
-        ts_df = pd.read_parquet(f"{bucket}/data/covidlive/{location}.parquet")
-
         ts_df['location'] = location
         all_ts.append(ts_df.reset_index())
 
