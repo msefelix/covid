@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 import dash
 import dash_bootstrap_components as dbc
@@ -7,8 +6,7 @@ from dash import dcc
 from dash.dependencies import Input, Output
 from datetime import date
 from cofli.utils import load_pyfile
-from cofli.settings import locations, bucket
-from cofli.visual.cf_update_covidlive import fig_types, make_ts_figs
+from cofli.visual.cf_update_covidlive import make_ts_figs
 from cofli.visual.cf_update_vic import create_ts_figs
 
 ################## Settings for main, app.yaml and Dockerfile
