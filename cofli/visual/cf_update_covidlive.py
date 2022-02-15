@@ -28,22 +28,17 @@ def make_a_ts_fig(df: pd.DataFrame, y:str, title:str):
     return fig
 
 
-def make_ts_figs(save_figs=True):
+def make_ts_figs(bucket):
     all_figs = {}
-    all_ts = pd.read_parquet(f"{bucket}/data/covidlive/all.parquet") 
+    all_ts = pd.read_parquet(f"{bucket}/data/covidlive/all.parquet")
 
     for location in locations:
         df = all_ts.query(f"location == '{location}'")
         figs = {}
         for data_type, data_name in fig_types.items():
             fig = make_a_ts_fig(df, data_type, data_name)
-            if save_figs:
-                save_pyfile(fig, f"{bucket}/data/covidlive/ts_figs/{location}_{data_type}.pickle", fs=gcsfs.GCSFileSystem())
-            else:
-                figs[data_type] = fig
-            all_figs[data_type] = figs
+            figs[data_type] = fig
+     
+        all_figs[location] = figs
 
-    if save_figs:
-        return
-    else:
-        return all_figs
+    return all_figs

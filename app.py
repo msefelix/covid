@@ -27,19 +27,12 @@ from cofli.visual.cf_update_vic import create_ts_figs
 
 
 ################## Data loading
-fstype = os.getenv('FSTYPE')
-if fstype == 'local':
-    fs = ''
-else:
-    import gcsfs
-    fs = gcsfs.GCSFileSystem()
-
 today = str(date.today())
 year, month, day = map(int, today.split('-'))
 
-covidlive_ts_figs = make_ts_figs(save_figs=False)
-vic_gov_ts = pd.read_parquet(f"{bucket}/data/vic/cases_post.parquet")
-vic_postcode_fig = load_pyfile(f"{bucket}/data/vic/vic_post_active_map.pickle", fs=fs)
+covidlive_ts_figs = make_ts_figs(".")
+vic_gov_ts = pd.read_parquet(f"./data/vic/cases_post.parquet")
+vic_postcode_fig = load_pyfile(f"./data/vic/vic_post_active_map.pickle", fs='')
 
 
 ################## App settings
