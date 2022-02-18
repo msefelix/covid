@@ -28,9 +28,9 @@ def make_a_ts_fig(df: pd.DataFrame, y:str, title:str):
     return fig
 
 
-def make_ts_figs(bucket):
+def make_ts_figs(root_folder=bucket):
     all_figs = {}
-    all_ts = pd.read_parquet(f"{bucket}/data/covidlive/all.parquet")
+    all_ts = pd.read_parquet(f"{root_folder}/data/covidlive/all.parquet")
 
     for location in locations:
         df = all_ts.query(f"location == '{location}'")

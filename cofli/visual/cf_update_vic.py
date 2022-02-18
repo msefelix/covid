@@ -6,10 +6,10 @@ from cofli.settings import bucket, today
 from cofli.utils import save_pyfile, read_gcs_zip
 
 
-def update_geo_fig(filename='post'):
-    df = pd.read_parquet(f"{bucket}/data/vic/cases_{filename}.parquet")
+def update_geo_fig(filename='post', root_folder=bucket):
+    df = pd.read_parquet(f"{root_folder}/data/vic/cases_{filename}.parquet")
     df_today = df.query(f"file_processed_date == '{today}'").set_index('postcode')
-    gdf = read_gcs_zip(f"{bucket}/data/geo/vic/vic.zip").set_index('postcode')
+    gdf = read_gcs_zip(f"{root_folder}/data/geo/vic/vic.zip").set_index('postcode')
     df_today = gdf.join(df_today, how='right')
 
     fig = px.choropleth_mapbox(df_today,
@@ -25,7 +25,7 @@ def update_geo_fig(filename='post'):
     fig.update_geos(fitbounds="locations", visible=False) # fs is instantiated here due to cloud function 'bug'
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 
-    save_pyfile(fig, f"{bucket}/data/vic/vic_post_active_map.pickle", fs=gcsfs.GCSFileSystem())
+    save_pyfile(fig, f"{root_folder}/data/vic/vic_post_active_map.pickle", fs=gcsfs.GCSFileSystem())
 
     return
 

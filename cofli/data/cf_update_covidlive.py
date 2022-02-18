@@ -44,7 +44,7 @@ def consolidate_ts(live_ts: Dict[str, pd.DataFrame]) -> pd.DataFrame:
     return res
 
 
-def update_ts():
+def update_ts(root_folder=bucket):
     all_ts = []
     for location in locations:
         print(location)
@@ -58,12 +58,12 @@ def update_ts():
         ts7.columns = [f"7D AVG - {x}" for x in ts7.columns]
         ts_df = ts_df.join(ts7)
 
-        ts_df.to_parquet(f"{bucket}/data/covidlive/{location}.parquet")
+        ts_df.to_parquet(f"{root_folder}/data/covidlive/{location}.parquet")
 
         ts_df['location'] = location
         all_ts.append(ts_df.reset_index())
 
     all_ts = pd.concat(all_ts, axis=0, ignore_index=True).set_index('date')
-    all_ts.to_parquet(f"{bucket}/data/covidlive/all.parquet")
+    all_ts.to_parquet(f"{root_folder}/data/covidlive/all.parquet")
 
     return
