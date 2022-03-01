@@ -50,8 +50,3 @@ def make_ts_figs(root_folder=bucket):
         all_figs[location] = figs
 
     return all_figs
-
-from gcloud import storage
-client = storage.Client()
-bucket = client.get_bucket('<bucket_name>')
-blob = bucket.blob('test_file.txt')
