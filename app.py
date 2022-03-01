@@ -1,13 +1,13 @@
-import pandas as pd
+# import pandas as pd
 import dash
 import dash_bootstrap_components as dbc
 from dash import html
 from dash import dcc
 from dash.dependencies import Input, Output
 from datetime import date
-from cofli.utils import load_pyfile
 from cofli.visual.cf_update_covidlive import make_ts_figs
-from cofli.visual.cf_update_vic import create_ts_figs
+# from cofli.utils import load_pyfile
+# from cofli.visual.cf_update_vic import create_ts_figs
 
 ################## Settings for main, app.yaml and Dockerfile
 # https://towardsdatascience.com/dockerize-your-dash-app-1e155dd1cea3
@@ -16,11 +16,7 @@ from cofli.visual.cf_update_vic import create_ts_figs
 ################## Todo
 # Adjust repo for gcp & cf: # Update vic postcode data
 # Add high level data preparation to cloud func
-
 # Make app work on GCP
-
-# Dep on app engine
-
 # use bar chart & line chart combination for ts (not urgent)
 
 
@@ -29,8 +25,8 @@ today = str(date.today())
 year, month, day = map(int, today.split('-'))
 
 covidlive_ts_figs = make_ts_figs(".")
-vic_gov_ts = pd.read_parquet(f"./data/vic/cases_post.parquet")
-vic_postcode_fig = load_pyfile(f"./data/vic/vic_post_active_map.pickle", fs='')
+# vic_gov_ts = pd.read_parquet(f"./data/vic/cases_post.parquet")
+# vic_postcode_fig = load_pyfile(f"./data/vic/vic_post_active_map.pickle", fs='')
 
 
 ################## App settings
@@ -168,7 +164,7 @@ def build_ts_tab():
 
 ################## App layout
 app.layout = dbc.Container([
-                            html.H1("COVID-19 Trend in Australia", className='text-center text-primary mb-4'),
+                            html.H1("COVID-19 Trend Visualisation in Australia (soure: https://covidlive.com.au/)", className='text-center text-primary mb-4'),
                             dcc.Tabs(id="top-tabs", value='timeseries', 
                                     children=[
                                             dcc.Tab(label='Evolution by state',
