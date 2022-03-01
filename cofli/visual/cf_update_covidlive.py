@@ -30,7 +30,16 @@ def make_a_ts_fig(df: pd.DataFrame, y:str, title:str):
 
 def make_ts_figs(root_folder=bucket):
     all_figs = {}
-    all_ts = pd.read_parquet(f"{root_folder}/data/covidlive/all.parquet")
+
+    if "gs://" in root_folder:
+        from gcloud import storage
+        client = storage.Client()
+        bucket = client.get_bucket(bucket.split("//")[1])
+        blob = bucket.blob("data/covidlive/all.parquet")
+        all_ts = pd.read_parquet(blob)
+
+    else:
+        all_ts = pd.read_parquet(f"{root_folder}/data/covidlive/all.parquet")
 
     for location in locations:
         df = all_ts.query(f"location == '{location}'")
@@ -42,3 +51,8 @@ def make_ts_figs(root_folder=bucket):
         all_figs[location] = figs
 
     return all_figs
+
+from gcloud import storage
+client = storage.Client()
+bucket = client.get_bucket('<bucket_name>')
+blob = bucket.blob('test_file.txt')
