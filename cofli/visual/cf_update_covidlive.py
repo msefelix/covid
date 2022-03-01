@@ -35,7 +35,8 @@ def make_ts_figs(root_folder=bucket):
         from gcloud import storage
         bucket = storage.Client().get_bucket(root_folder.split("//")[1])
         blob = bucket.blob("data/covidlive/all.parquet")
-        all_ts = pd.read_parquet(blob)
+        blob.download_to_filename("covidlive_all.parquet")
+        all_ts = pd.read_parquet("covidlive_all.parquet")
 
     else:
         all_ts = pd.read_parquet(f"{root_folder}/data/covidlive/all.parquet")
