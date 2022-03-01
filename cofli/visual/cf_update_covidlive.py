@@ -33,8 +33,7 @@ def make_ts_figs(root_folder=bucket):
 
     if "gs://" in root_folder:
         from gcloud import storage
-        client = storage.Client()
-        bucket = client.get_bucket(bucket.split("//")[1])
+        bucket = storage.Client().get_bucket(root_folder.split("//")[1])
         blob = bucket.blob("data/covidlive/all.parquet")
         all_ts = pd.read_parquet(blob)
 
