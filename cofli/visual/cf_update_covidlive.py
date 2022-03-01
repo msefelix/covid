@@ -1,9 +1,7 @@
-import gcsfs
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 from cofli.settings import locations, bucket
-from cofli.utils import save_pyfile
 fig_types = {'new':'Daily New Cases (PCR + RAT)',
                                     'deaths':'Daily Lives Lost',
                                     'hosp':'Hospitalised', 
@@ -31,15 +29,7 @@ def make_a_ts_fig(df: pd.DataFrame, y:str, title:str):
 def make_ts_figs(root_folder=bucket):
     all_figs = {}
 
-    if "gs://" in root_folder:
-        from gcloud import storage
-        bucket = storage.Client().get_bucket(root_folder.split("//")[1])
-        blob = bucket.blob("data/covidlive/all.parquet")
-        blob.download_to_filename("covidlive_all.parquet")
-        all_ts = pd.read_parquet("covidlive_all.parquet")
-
-    else:
-        all_ts = pd.read_parquet(f"{root_folder}/data/covidlive/all.parquet")
+    all_ts = pd.read_parquet(f"{root_folder}/data/covidlive/all.parquet")
 
     for location in locations:
         df = all_ts.query(f"location == '{location}'")
