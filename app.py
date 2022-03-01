@@ -152,19 +152,19 @@ def build_ts_tab():
             ]
 
 
-@app.callback(
-    Output('vic-postcode-clicked', 'children'),
-    Output('vic-postcode-ts', 'children'),
-    Input('vic-postcode', 'clickData'))
-def build_vic_postcode_ts(input_data):
-    try:
-        postcode = int(input_data['points'][0]['location'])
-    except:
-        postcode = 3000
+# @app.callback(
+#     Output('vic-postcode-clicked', 'children'),
+#     Output('vic-postcode-ts', 'children'),
+#     Input('vic-postcode', 'clickData'))
+# def build_vic_postcode_ts(input_data):
+#     try:
+#         postcode = int(input_data['points'][0]['location'])
+#     except:
+#         postcode = 3000
     
-    figs = create_ts_figs(vic_gov_ts, postcode)
-    return f"Trend of Postcode {postcode}", [dbc.Col(dcc.Graph(id=f'vic-postcode-ts-{x}', figure=figs[x]), width=4) 
-            for x in ['new', 'active pop %', 'approximate infected pop %']]
+#     figs = create_ts_figs(vic_gov_ts, postcode)
+#     return f"Trend of Postcode {postcode}", [dbc.Col(dcc.Graph(id=f'vic-postcode-ts-{x}', figure=figs[x]), width=4) 
+#             for x in ['new', 'active pop %', 'approximate infected pop %']]
 
 ################## App layout
 app.layout = dbc.Container([
@@ -175,18 +175,18 @@ app.layout = dbc.Container([
                                                     value='timeseries', 
                                                     children=build_ts_tab(),
                                                     style=tab_style, selected_style=tab_selected_style),
-                                            dcc.Tab(label='Victoria by postcode',
-                                                    value='vic-postcode',
-                                                    children=[
-                                                            html.H5("""Click an area on map to view details. Color reflects the percentage of active cases out of the population.
-                                                                       *Caveat*: Population data is not up-to-date and it will be updated with census 2021 data once available""",
-                                                                    className='text-center text-primary mb-4'),
-                                                            dbc.Row(dcc.Graph(id='vic-postcode', figure=vic_postcode_fig)),
-                                                            html.Br(),
-                                                            html.H4(id='vic-postcode-clicked', className='text-center text-primary mb-4'),
-                                                            dbc.Row(id='vic-postcode-ts')
-                                                            ],
-                                                    style=tab_style, selected_style=tab_selected_style)
+                                            # dcc.Tab(label='Victoria by postcode',
+                                            #         value='vic-postcode',
+                                            #         children=[
+                                            #                 html.H5("""Click an area on map to view details. Color reflects the percentage of active cases out of the population.
+                                            #                            *Caveat*: Population data is not up-to-date and it will be updated with census 2021 data once available""",
+                                            #                         className='text-center text-primary mb-4'),
+                                            #                 dbc.Row(dcc.Graph(id='vic-postcode', figure=vic_postcode_fig)),
+                                            #                 html.Br(),
+                                            #                 html.H4(id='vic-postcode-clicked', className='text-center text-primary mb-4'),
+                                            #                 dbc.Row(id='vic-postcode-ts')
+                                            #                 ],
+                                            #         style=tab_style, selected_style=tab_selected_style)
                                     ], style=tabs_styles)
                             ])
 
