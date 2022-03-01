@@ -16,7 +16,11 @@ from cofli.visual.cf_update_covidlive import make_ts_figs
 ################## Todo
 # Adjust repo for gcp & cf: # Update vic postcode data
 # Add high level data preparation to cloud func
+
 # Make app work on GCP
+
+# Dep on app engine
+
 # use bar chart & line chart combination for ts (not urgent)
 
 
@@ -55,11 +59,11 @@ app = dash.Dash(__name__, external_stylesheets=["https://cdn.jsdelivr.net/npm/bo
 # Expose Flask instance
 server = app.server
 
-# # Trial with log
-# import logging
-# gunicorn_logger = logging.getLogger('gunicorn.error')
-# app.logger.handlers = gunicorn_logger.handlers
-# app.logger.setLevel(logging.DEBUG)
+# Trial with log
+import logging
+gunicorn_logger = logging.getLogger('gunicorn.error')
+app.logger.handlers = gunicorn_logger.handlers
+app.logger.setLevel(logging.DEBUG)
 
 
 ################## App content building
@@ -131,8 +135,8 @@ def build_ts_tab():
             html.Br(),
             dbc.Row(
                 [
-                dbc.Col(html.H5("Select location", className='text-center text-primary mb-4'), width=3),
-                dbc.Col(html.H5("Select date range", className='text-center text-primary mb-4'), width=3)
+                dbc.Col(html.H5("Location", className='text-center text-primary mb-4'), width=3),
+                dbc.Col(html.H5("Date range", className='text-center text-primary mb-4'), width=3)
                 ],
                 justify="evenly",
             ),
@@ -164,10 +168,11 @@ def build_ts_tab():
 
 ################## App layout
 app.layout = dbc.Container([
-                            html.H1("COVID-19 Trend Visualisation in Australia (soure: https://covidlive.com.au/)", className='text-center text-primary mb-4'),
+                            html.H1("Visualisation of COVID-19 Trend in Australia", className='text-center text-primary mb-4'),
+                            html.H3("Data Source: https://covidlive.com.au/", className='text-center text-primary mb-4'),
                             dcc.Tabs(id="top-tabs", value='timeseries', 
                                     children=[
-                                            dcc.Tab(label='Evolution by state',
+                                            dcc.Tab(label='Please select location and date range',
                                                     value='timeseries', 
                                                     children=build_ts_tab(),
                                                     style=tab_style, selected_style=tab_selected_style),
