@@ -14,7 +14,8 @@ RUN set -ex && \
     pip install plotly==5.5.0 && \
     pip install pyarrow==4.0.1 && \
     pip install requests==2.25.1 && \
-    pip install Flask gunicorn
+    pip install Flask gunicorn && \
+    pip install gcloud
 
 COPY . /app
 WORKDIR /app
