@@ -28,7 +28,7 @@ from cofli.visual.cf_update_covidlive import make_ts_figs
 # today = str(date.today())
 # year, month, day = map(int, today.split('-'))
 covidlive_ts_figs, today = make_ts_figs(".")
-year, month, day = today.split("-")
+year, month, day = map(int, today.split("-"))
 # vic_gov_ts = pd.read_parquet(f"./data/vic/cases_post.parquet")
 # vic_postcode_fig = load_pyfile(f"./data/vic/vic_post_active_map.pickle", fs='')
 
