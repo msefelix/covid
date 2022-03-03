@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 from dash import html
 from dash import dcc
 from dash.dependencies import Input, Output
-# from datetime import date
+from datetime import date
 from cofli.visual.cf_update_covidlive import make_ts_figs
 # from cofli.utils import load_pyfile
 # from cofli.visual.cf_update_vic import create_ts_figs
