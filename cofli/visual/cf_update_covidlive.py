@@ -40,4 +40,4 @@ def make_ts_figs(root_folder=bucket):
      
         all_figs[location] = figs
 
-    return all_figs, str(all_ts.index.max())
+    return all_figs, str(all_ts.index.max()).split(" ")[0]
