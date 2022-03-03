@@ -1,4 +1,3 @@
-# import pandas as pd
 import dash
 import dash_bootstrap_components as dbc
 from dash import html
@@ -12,21 +11,13 @@ from cofli.visual.cf_update_covidlive import make_ts_figs
 ################## Settings for main, app.yaml and Dockerfile
 # https://towardsdatascience.com/dockerize-your-dash-app-1e155dd1cea3
 
-
 ################## Todo
-# Adjust repo for gcp & cf: # Update vic postcode data
-# Add high level data preparation to cloud func
-
-# Make app work on GCP
-
-# Dep on app engine
-
-# use bar chart & line chart combination for ts (not urgent)
-
+# Make y-axis range auto adjustable when changing x-axis (date range)
+# Predictions
+# Lookup by postcode
+# Email stats to registered user
 
 ################## Data loading
-# today = str(date.today())
-# year, month, day = map(int, today.split('-'))
 covidlive_ts_figs, today = make_ts_figs(".")
 year, month, day = map(int, today.split("-"))
 # vic_gov_ts = pd.read_parquet(f"./data/vic/cases_post.parquet")
@@ -99,6 +90,7 @@ def build_date_range():
 def _build_ts_graph(id, figures, date_ranges):
     fig = figures[id.split("-")[-1]]
     fig = fig.update_xaxes(range=date_ranges)
+    fig = fig.update_yaxes(autorange=True, fixedrange=False)
     fig.layout.template = 'plotly_white'
     return dcc.Graph(id=id, figure=fig)
 
@@ -168,7 +160,7 @@ def build_ts_tab():
 
 ################## App layout
 app.layout = dbc.Container([
-                            html.H1("Visualisation of COVID-19 Trend in Australia", className='text-center text-primary mb-4'),
+                            html.H1("COVID-19 Trend in Australia (raw and 7-Day average)", className='text-center text-primary mb-4'),
                             html.H3("Data Source: https://covidlive.com.au/", className='text-center text-primary mb-4'),
                             dcc.Tabs(id="top-tabs", value='timeseries', 
                                     children=[
