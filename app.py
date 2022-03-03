@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 from dash import html
 from dash import dcc
 from dash.dependencies import Input, Output
-from datetime import date
+# from datetime import date
 from cofli.visual.cf_update_covidlive import make_ts_figs
 # from cofli.utils import load_pyfile
 # from cofli.visual.cf_update_vic import create_ts_figs
@@ -25,10 +25,10 @@ from cofli.visual.cf_update_covidlive import make_ts_figs
 
 
 ################## Data loading
-today = str(date.today())
-year, month, day = map(int, today.split('-'))
-
-covidlive_ts_figs = make_ts_figs(".")
+# today = str(date.today())
+# year, month, day = map(int, today.split('-'))
+covidlive_ts_figs, today = make_ts_figs(".")
+year, month, day = today.split("-")
 # vic_gov_ts = pd.read_parquet(f"./data/vic/cases_post.parquet")
 # vic_postcode_fig = load_pyfile(f"./data/vic/vic_post_active_map.pickle", fs='')
 
