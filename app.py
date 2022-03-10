@@ -6,6 +6,7 @@ from dash.dependencies import Input, Output
 from datetime import date
 from cofli.visual.cf_update_covidlive import make_ts_figs
 import plotly.graph_objects as go
+import pandas as pd
 # from cofli.utils import load_pyfile
 # from cofli.visual.cf_update_vic import create_ts_figs
 
@@ -81,11 +82,8 @@ def build_date_range(year, month, day, today):
         style={'align-items': 'center', 'justify-content': 'center'})
 
 
-def _build_ts_graph(id, figures, date_ranges):
+def _build_ts_graph(id, figures):
     fig = go.Figure(**figures[id.split("-")[-1]])
-    fig = fig.update_xaxes(range=date_ranges)
-    fig = fig.update_yaxes(autorange=True, fixedrange=False)
-    fig.layout.template = 'plotly_white'
     return dcc.Graph(id=id, figure=fig)
 
 
@@ -118,33 +116,32 @@ def build_ts_tab(year, month, day, today):
     Input('ts-date-picker', 'end_date')
 )
 def build_ts_by_location(my_store, location, start_date, end_date):
-# FIXME Decouple figure update induced by date from location induced update
-    figures = my_store['store-figs'][location]
-    date_ranges = (str(start_date), str(end_date))
-    # return html.H1(str(type(figures)))
+    ts_df = my_store['covidlive-data'].loc[str(start_date) : str(end_date)].query(f"location == '{location}'")
+    figures = make_ts_figs(ts_df)
     return html.Div([
                     dbc.Row([
-                                dbc.Col(_build_ts_graph('ts-figure-active', figures, date_ranges), width=6),
-                                dbc.Col(_build_ts_graph('ts-figure-hosp', figures, date_ranges), width=6)
+                                dbc.Col(_build_ts_graph('ts-figure-active', figures), width=6),
+                                dbc.Col(_build_ts_graph('ts-figure-hosp', figures), width=6)
                             ]),
                     dbc.Row([
-                                dbc.Col(_build_ts_graph('ts-figure-new', figures, date_ranges), width=6),
-                                dbc.Col(_build_ts_graph('ts-figure-deaths', figures, date_ranges), width=6)
+                                dbc.Col(_build_ts_graph('ts-figure-new', figures), width=6),
+                                dbc.Col(_build_ts_graph('ts-figure-deaths', figures), width=6)
                             ]),
                     dbc.Row([
-                                dbc.Col(_build_ts_graph('ts-figure-icu', figures, date_ranges), width=6),
-                                dbc.Col(_build_ts_graph('ts-figure-vent', figures, date_ranges), width=6)
+                                dbc.Col(_build_ts_graph('ts-figure-icu', figures), width=6),
+                                dbc.Col(_build_ts_graph('ts-figure-vent', figures), width=6)
                             ]),
                     ]
                     )
 
 ################## App layout
 def serve_layout():
-    covidlive_ts_figs, today = make_ts_figs(".")
+    all_ts = pd.read_parquet(f"./data/covidlive/all.parquet")
+    today = str(all_ts.index.max()).split(" ")[0]
     year, month, day = map(int, today.split("-"))
 
     layout = dbc.Container([    
-                            dcc.Store(id='my-store', data={'store-figs': covidlive_ts_figs}),
+                            dcc.Store(id='my-store', data={'covidlive-data': all_ts}),
                             html.H1("COVID-19 Trend in Australia (raw and 7-Day average)", className='text-center text-primary mb-4'),
                             html.H3("Data Source: https://covidlive.com.au/", className='text-center text-primary mb-4'),
                             dcc.Tabs(id="top-tabs", value='timeseries', 

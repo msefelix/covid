@@ -26,10 +26,8 @@ def make_a_ts_fig(df: pd.DataFrame, y:str, title:str):
     return fig
 
 
-def make_ts_figs(root_folder=bucket):
+def make_all_ts_figs(all_ts):
     all_figs = {}
-
-    all_ts = pd.read_parquet(f"{root_folder}/data/covidlive/all.parquet")
 
     for location in locations:
         df = all_ts.query(f"location == '{location}'")
@@ -40,4 +38,13 @@ def make_ts_figs(root_folder=bucket):
      
         all_figs[location] = figs
 
-    return all_figs, str(all_ts.index.max()).split(" ")[0]
+    return all_figs
+
+
+def make_ts_figs(ts_by_location):
+    figs = {}
+    for data_type, data_name in fig_types.items():
+        fig = make_a_ts_fig(ts_by_location, data_type, data_name)
+        fig.layout.template = 'plotly_white'
+        figs[data_type] = fig
+    return figs
