@@ -5,10 +5,7 @@ from dash import dcc
 from dash.dependencies import Input, Output
 from datetime import date
 from cofli.visual.cf_update_covidlive import make_ts_figs
-import plotly.graph_objects as go
 import pandas as pd
-# from cofli.utils import load_pyfile
-# from cofli.visual.cf_update_vic import create_ts_figs
 
 ################## Settings for main, app.yaml and Dockerfile
 # https://towardsdatascience.com/dockerize-your-dash-app-1e155dd1cea3
@@ -83,8 +80,7 @@ def build_date_range(year, month, day, today):
 
 
 def _build_ts_graph(id, figures):
-    fig = go.Figure(**figures[id.split("-")[-1]])
-    return dcc.Graph(id=id, figure=fig)
+    return dcc.Graph(id=id, figure=figures[id.split("-")[-1]])
 
 
 def build_ts_tab(year, month, day, today):
@@ -116,7 +112,9 @@ def build_ts_tab(year, month, day, today):
     Input('ts-date-picker', 'end_date')
 )
 def build_ts_by_location(my_store, location, start_date, end_date):
-    ts_df = my_store['covidlive-data'].loc[str(start_date) : str(end_date)].query(f"location == '{location}'")
+    ts_df = pd.DataFrame.from_records(my_store['covidlive-data']).set_index('date')
+    ts_df.index = pd.to_datetime(ts_df.index, format="%Y-%m-%d")
+    ts_df = ts_df.loc[str(start_date) : str(end_date)].query(f"location == '{location}'")
     figures = make_ts_figs(ts_df)
     return html.Div([
                     dbc.Row([
@@ -139,9 +137,11 @@ def serve_layout():
     all_ts = pd.read_parquet(f"./data/covidlive/all.parquet")
     today = str(all_ts.index.max()).split(" ")[0]
     year, month, day = map(int, today.split("-"))
+    all_ts = all_ts.reset_index().to_dict('records') # FIXME: can the store be replaced by some other classes to store dataframe directly?
 
-    layout = dbc.Container([    
-                            dcc.Store(id='my-store', data={'covidlive-data': all_ts}),
+    layout = html.Div([
+                        dcc.Store(id='my-store', data={'covidlive-data': all_ts}),
+                        dbc.Container([    
                             html.H1("COVID-19 Trend in Australia (raw and 7-Day average)", className='text-center text-primary mb-4'),
                             html.H3("Data Source: https://covidlive.com.au/", className='text-center text-primary mb-4'),
                             dcc.Tabs(id="top-tabs", value='timeseries', 
@@ -151,7 +151,7 @@ def serve_layout():
                                                     children=build_ts_tab(year, month, day, today) + [html.Div(id='covidlive-ts-plots')],
                                                     style=tab_style, selected_style=tab_selected_style),
                                         ], style=tabs_styles)
-                                ])
+                                ])])
     
     return layout
 
