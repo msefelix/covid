@@ -5,6 +5,7 @@ from dash import dcc
 from dash.dependencies import Input, Output
 from datetime import date
 from cofli.visual.cf_update_covidlive import make_ts_figs
+import plotly.graph_objects as go
 # from cofli.utils import load_pyfile
 # from cofli.visual.cf_update_vic import create_ts_figs
 
@@ -16,13 +17,6 @@ from cofli.visual.cf_update_covidlive import make_ts_figs
 # Predictions
 # Lookup by postcode
 # Email stats to registered user
-
-################## Data loading
-covidlive_ts_figs, today = make_ts_figs(".")
-year, month, day = map(int, today.split("-"))
-# vic_gov_ts = pd.read_parquet(f"./data/vic/cases_post.parquet")
-# vic_postcode_fig = load_pyfile(f"./data/vic/vic_post_active_map.pickle", fs='')
-
 
 ################## App settings
 tabs_styles = {
@@ -77,7 +71,7 @@ def build_location_dropdown():
     )
 
 
-def build_date_range():
+def build_date_range(year, month, day, today):
     return  dcc.DatePickerRange(
         id='ts-date-picker',
         min_date_allowed=date(2020, 1, 26),
@@ -88,23 +82,46 @@ def build_date_range():
 
 
 def _build_ts_graph(id, figures, date_ranges):
-    fig = figures[id.split("-")[-1]]
+    fig = go.Figure(**figures[id.split("-")[-1]])
     fig = fig.update_xaxes(range=date_ranges)
     fig = fig.update_yaxes(autorange=True, fixedrange=False)
     fig.layout.template = 'plotly_white'
     return dcc.Graph(id=id, figure=fig)
 
 
+def build_ts_tab(year, month, day, today):
+    return  [
+            html.Br(),
+            dbc.Row(
+                [
+                dbc.Col(html.H5("Location", className='text-center text-primary mb-4'), width=3),
+                dbc.Col(html.H5("Date range", className='text-center text-primary mb-4'), width=3)
+                ],
+                justify="evenly",
+            ),
+            dbc.Row(
+                [
+                dbc.Col(build_location_dropdown(), width=3), 
+                dbc.Col(build_date_range(year, month, day, today), width=3)
+                ],
+                justify="evenly",
+            ),
+            html.Br()  
+            ]
+
+
 @app.callback(
     Output(component_id='covidlive-ts-plots', component_property='children'),
+    Input(component_id='my-store', component_property='data'),
     Input(component_id='location-dropdown', component_property='value'),
     Input('ts-date-picker', 'start_date'),
     Input('ts-date-picker', 'end_date')
 )
-def build_ts_by_location(location, start_date, end_date):
+def build_ts_by_location(my_store, location, start_date, end_date):
 # FIXME Decouple figure update induced by date from location induced update
-    figures = covidlive_ts_figs[location]
+    figures = my_store['store-figs'][location]
     date_ranges = (str(start_date), str(end_date))
+    # return html.H1(str(type(figures)))
     return html.Div([
                     dbc.Row([
                                 dbc.Col(_build_ts_graph('ts-figure-active', figures, date_ranges), width=6),
@@ -121,68 +138,27 @@ def build_ts_by_location(location, start_date, end_date):
                     ]
                     )
 
-
-def build_ts_tab():
-    return  [
-            html.Br(),
-            dbc.Row(
-                [
-                dbc.Col(html.H5("Location", className='text-center text-primary mb-4'), width=3),
-                dbc.Col(html.H5("Date range", className='text-center text-primary mb-4'), width=3)
-                ],
-                justify="evenly",
-            ),
-            dbc.Row(
-                [
-                dbc.Col(build_location_dropdown(), width=3), 
-                dbc.Col(build_date_range(), width=3)
-                ],
-                justify="evenly",
-            ),
-            html.Br(),
-            html.Div(id='covidlive-ts-plots')           
-            ]
-
-
-# @app.callback(
-#     Output('vic-postcode-clicked', 'children'),
-#     Output('vic-postcode-ts', 'children'),
-#     Input('vic-postcode', 'clickData'))
-# def build_vic_postcode_ts(input_data):
-#     try:
-#         postcode = int(input_data['points'][0]['location'])
-#     except:
-#         postcode = 3000
-    
-#     figs = create_ts_figs(vic_gov_ts, postcode)
-#     return f"Trend of Postcode {postcode}", [dbc.Col(dcc.Graph(id=f'vic-postcode-ts-{x}', figure=figs[x]), width=4) 
-#             for x in ['new', 'active pop %', 'approximate infected pop %']]
-
 ################## App layout
-app.layout = dbc.Container([
+def serve_layout():
+    covidlive_ts_figs, today = make_ts_figs(".")
+    year, month, day = map(int, today.split("-"))
+
+    layout = dbc.Container([    
+                            dcc.Store(id='my-store', data={'store-figs': covidlive_ts_figs}),
                             html.H1("COVID-19 Trend in Australia (raw and 7-Day average)", className='text-center text-primary mb-4'),
                             html.H3("Data Source: https://covidlive.com.au/", className='text-center text-primary mb-4'),
                             dcc.Tabs(id="top-tabs", value='timeseries', 
                                     children=[
                                             dcc.Tab(label='Please select location and date range',
                                                     value='timeseries', 
-                                                    children=build_ts_tab(),
+                                                    children=build_ts_tab(year, month, day, today) + [html.Div(id='covidlive-ts-plots')],
                                                     style=tab_style, selected_style=tab_selected_style),
-                                            # dcc.Tab(label='Victoria by postcode',
-                                            #         value='vic-postcode',
-                                            #         children=[
-                                            #                 html.H5("""Click an area on map to view details. Color reflects the percentage of active cases out of the population.
-                                            #                            *Caveat*: Population data is not up-to-date and it will be updated with census 2021 data once available""",
-                                            #                         className='text-center text-primary mb-4'),
-                                            #                 dbc.Row(dcc.Graph(id='vic-postcode', figure=vic_postcode_fig)),
-                                            #                 html.Br(),
-                                            #                 html.H4(id='vic-postcode-clicked', className='text-center text-primary mb-4'),
-                                            #                 dbc.Row(id='vic-postcode-ts')
-                                            #                 ],
-                                            #         style=tab_style, selected_style=tab_selected_style)
-                                    ], style=tabs_styles)
-                            ])
+                                        ], style=tabs_styles)
+                                ])
+    
+    return layout
 
 
+app.layout = serve_layout
 if __name__ == '__main__':
-    app.run_server(debug=True, host="0.0.0.0", port=8080)
+    app.run_server(debug=True, host="0.0.0.0", port=8050)
