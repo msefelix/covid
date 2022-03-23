@@ -4,8 +4,9 @@ from dash import html
 from dash import dcc
 from dash.dependencies import Input, Output
 from datetime import date
-from cofli.visual.cf_update_covidlive import make_ts_figs
+from cofli.visual.cf_update_covidlive import make_all_ts_figs
 import pandas as pd
+import plotly.graph_objects as go
 
 ################## Settings for main, app.yaml and Dockerfile
 # https://towardsdatascience.com/dockerize-your-dash-app-1e155dd1cea3
@@ -79,8 +80,10 @@ def build_date_range(year, month, day, today):
         style={'align-items': 'center', 'justify-content': 'center'})
 
 
-def _build_ts_graph(id, figures):
-    return dcc.Graph(id=id, figure=figures[id.split("-")[-1]])
+def _build_ts_graph(id, figures, start_date, end_date):
+    fig = go.Figure(figures[id.split("-")[-1]])
+    fig.update_xaxes(range=[start_date, end_date])
+    return dcc.Graph(id=id, figure=fig)
 
 
 def build_ts_tab(year, month, day, today):
@@ -112,35 +115,35 @@ def build_ts_tab(year, month, day, today):
     Input('ts-date-picker', 'end_date')
 )
 def build_ts_by_location(my_store, location, start_date, end_date):
-    ts_df = pd.DataFrame.from_records(my_store['covidlive-data']).set_index('date')
-    ts_df.index = pd.to_datetime(ts_df.index, format="%Y-%m-%d")
-    ts_df = ts_df.loc[str(start_date) : str(end_date)].query(f"location == '{location}'")
-    figures = make_ts_figs(ts_df)
+    figures = my_store['covidlive-figs'][location]
     return html.Div([
                     dbc.Row([
-                                dbc.Col(_build_ts_graph('ts-figure-active', figures), width=6),
-                                dbc.Col(_build_ts_graph('ts-figure-hosp', figures), width=6)
+                                dbc.Col(_build_ts_graph('ts-figure-active', figures, start_date, end_date), width=6),
+                                dbc.Col(_build_ts_graph('ts-figure-hosp', figures, start_date, end_date), width=6)
                             ]),
                     dbc.Row([
-                                dbc.Col(_build_ts_graph('ts-figure-new', figures), width=6),
-                                dbc.Col(_build_ts_graph('ts-figure-deaths', figures), width=6)
+                                dbc.Col(_build_ts_graph('ts-figure-new', figures, start_date, end_date), width=6),
+                                dbc.Col(_build_ts_graph('ts-figure-deaths', figures, start_date, end_date), width=6)
                             ]),
                     dbc.Row([
-                                dbc.Col(_build_ts_graph('ts-figure-icu', figures), width=6),
-                                dbc.Col(_build_ts_graph('ts-figure-vent', figures), width=6)
+                                dbc.Col(_build_ts_graph('ts-figure-icu', figures, start_date, end_date), width=6),
+                                dbc.Col(_build_ts_graph('ts-figure-vent', figures, start_date, end_date), width=6)
                             ]),
                     ]
                     )
 
 ################## App layout
+# TODO: Use client side callback
 def serve_layout():
+    # Load covidlive data and make plolty figures, which will be stored on the client side.
     all_ts = pd.read_parquet(f"./data/covidlive/all.parquet")
     today = str(all_ts.index.max()).split(" ")[0]
     year, month, day = map(int, today.split("-"))
-    all_ts = all_ts.reset_index().to_dict('records') # FIXME: can the store be replaced by some other classes to store dataframe directly?
+    covidlive_figures = make_all_ts_figs(all_ts)
 
+    # Prepare layout
     layout = html.Div([
-                        dcc.Store(id='my-store', data={'covidlive-data': all_ts}),
+                        dcc.Store(id='my-store', data={'covidlive-figs': covidlive_figures}),
                         dbc.Container([    
                             html.H1("COVID-19 Trend in Australia (raw and 7-Day average)", className='text-center text-primary mb-4'),
                             html.H3("Data Source: https://covidlive.com.au/", className='text-center text-primary mb-4'),
