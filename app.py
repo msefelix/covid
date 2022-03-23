@@ -70,23 +70,35 @@ def build_location_dropdown():
     )
 
 
-def build_date_range(year, month, day, today):
+def build_date_range(year, month, day, today, date_2m_ago):
     return  dcc.DatePickerRange(
         id='ts-date-picker',
         min_date_allowed=date(2020, 1, 26),
         max_date_allowed=date(year, month, day),
-        start_date='2021-12-01',
+        start_date=date_2m_ago,
         end_date=today,
         style={'align-items': 'center', 'justify-content': 'center'})
 
 
 def _build_ts_graph(id, figures, start_date, end_date):
-    fig = go.Figure(figures[id.split("-")[-1]])
+    # Load figure data as json
+    fig = figures[id.split("-")[-1]]
+
+    # Recreate plolty figure and adjust the x axis range
+    fig = go.Figure(fig)
     fig.update_xaxes(range=[start_date, end_date])
+
+    # Compute the max value of y within the given x range and adjust the y axis range
+    x = fig['data'][0]['x']
+    y = fig['data'][0]['y']
+    xy = pd.Series(index=x, data=y)
+    y_max = xy.loc[start_date : end_date].max()
+    fig.update_yaxes(range=[0, y_max + max(1, int(y_max * 0.05))])
+
     return dcc.Graph(id=id, figure=fig)
 
 
-def build_ts_tab(year, month, day, today):
+def build_ts_tab(year, month, day, today, date_2m_ago):
     return  [
             html.Br(),
             dbc.Row(
@@ -99,7 +111,7 @@ def build_ts_tab(year, month, day, today):
             dbc.Row(
                 [
                 dbc.Col(build_location_dropdown(), width=3), 
-                dbc.Col(build_date_range(year, month, day, today), width=3)
+                dbc.Col(build_date_range(year, month, day, today, date_2m_ago), width=3)
                 ],
                 justify="evenly",
             ),
@@ -141,6 +153,9 @@ def serve_layout():
     year, month, day = map(int, today.split("-"))
     covidlive_figures = make_all_ts_figs(all_ts)
 
+    # By default, set the date range between today and two months ago
+    date_2m_ago = str((pd.Timestamp(today) - pd.DateOffset(months=2)).date())
+
     # Prepare layout
     layout = html.Div([
                         dcc.Store(id='my-store', data={'covidlive-figs': covidlive_figures}),
@@ -151,7 +166,7 @@ def serve_layout():
                                     children=[
                                             dcc.Tab(label='Please select location and date range',
                                                     value='timeseries', 
-                                                    children=build_ts_tab(year, month, day, today) + [html.Div(id='covidlive-ts-plots')],
+                                                    children=build_ts_tab(year, month, day, today, date_2m_ago) + [html.Div(id='covidlive-ts-plots')],
                                                     style=tab_style, selected_style=tab_selected_style),
                                         ], style=tabs_styles)
                                 ])])
